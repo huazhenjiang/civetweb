@@ -2206,6 +2206,31 @@ static struct ssl_func crypto_sw[] = {{"CRYPTO_num_locks", NULL},
 #endif /* NO_SSL_DL */
 #endif /* NO_SSL */
 
+const char *index_string_arr[]={
+"<html>\n",
+"<head>\n",
+"<title>Huazhen test!</title>\n",
+"</head>\n",
+"<body>\n",
+"<div style=\"float:right; width:100%; text-align:center;\">\n",
+"</div>\n",
+"<div style=\"float:left; height:50%; margin-bottom:-200px;\"></div>\n",
+"<div style=\"clear:both; height:400px; width:400px; margin: auto; position:relative;\">\n",
+"<img src=\"civetweb_64x64.png\" alt=\"logo\"/>\n",
+"<p>\n",
+"<b style=\"font-size:larger\"><a style=\"text-decoration:none\" href=\"https://sourceforge.net/projects/civetweb/\">Hua testing</a></b><br>\n",
+"<i>Your web server</i>\n",
+"<ul>\n",
+"<li><a href=\"https://github.com/civetweb/civetweb/blob/master/docs/UserManual.md\">User Manual</a></li>\n",
+"<li><a href=\"https://github.com/civetweb/civetweb/blob/master/RELEASE_NOTES.md\">Release Notes</a></li>\n",
+"<li><a href=\"https://sourceforge.net/projects/civetweb/\">Downloads</a></li>\n",
+"<li><a href=\"https://github.com/civetweb/civetweb\">GitHub</a></li>\n",
+"</ul>\n",
+"</p>\n",
+"</div>\n",
+"</body>\n",
+"</html>\n"
+};
 
 #if !defined(NO_CACHING)
 static const char month_names[][4] = {"Jan",
@@ -9359,6 +9384,7 @@ handle_directory_request(struct mg_connection *conn, const char *dir)
 	const char *title;
 	time_t curtime = time(NULL);
 
+	printf("\r\nhandle_directory_request()");
 	if (!scan_directory(conn, dir, &data, dir_scan_callback)) {
 		mg_send_http_error(conn,
 		                   500,
@@ -9865,6 +9891,14 @@ handle_static_file_request(struct mg_connection *conn,
 		{
 			/* Send file directly */
 			send_file_data(conn, filep, r1, cl);
+			/*hua
+			int i=0,len=0;
+			while(index_string_arr[i] != '\0'){
+				len=strlen(index_string_arr[i]);
+				mg_write(conn, index_string_arr[i], len);
+				i++;
+			}
+			*/			
 		}
 	}
 	(void)mg_fclose(&filep->access); /* ignore error on read only file */
@@ -11889,6 +11923,8 @@ handle_ssi_file_request(struct mg_connection *conn,
 		                   path,
 		                   strerror(ERRNO));
 	} else {
+		printf("\r\nhandle_ssi_file_request()");
+
 		conn->must_close = 1;
 		gmt_time_string(date, sizeof(date), &curtime);
 		fclose_on_exec(&filep->access, conn);
@@ -13950,10 +13986,10 @@ handle_request(struct mg_connection *conn)
 		 * or it is a PUT or DELETE request to a resource that does not
 		 * correspond to a file. Check authorization. */
 		printf("\r\n a6.3 path:%s",path);
-		if (!check_authorization(conn, path)) {
-			send_authorization_request(conn, NULL);
-			return;
-		}
+		//if (!check_authorization(conn, path)) {
+		//	send_authorization_request(conn, NULL);
+		//	return;
+		//}
 	}
 
 	/* request is authorized or does not need authorization */
