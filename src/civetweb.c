@@ -9889,9 +9889,11 @@ handle_static_file_request(struct mg_connection *conn,
 		} else
 #endif
 		{
+			printf("\r\n---send file directly--");
 			/* Send file directly */
 			send_file_data(conn, filep, r1, cl);
-			/*hua
+			/* 
+			//hua
 			int i=0,len=0;
 			while(index_string_arr[i] != '\0'){
 				len=strlen(index_string_arr[i]);
@@ -13985,11 +13987,12 @@ handle_request(struct mg_connection *conn)
 		/* 6.3. This is either a OPTIONS, GET, HEAD or POST request,
 		 * or it is a PUT or DELETE request to a resource that does not
 		 * correspond to a file. Check authorization. */
+		//hua
 		printf("\r\n a6.3 path:%s",path);
-		//if (!check_authorization(conn, path)) {
-		//	send_authorization_request(conn, NULL);
-		//	return;
-		//}
+		if (!check_authorization(conn, path)) {
+			send_authorization_request(conn, NULL);
+			return;
+		}
 	}
 
 	/* request is authorized or does not need authorization */
@@ -14231,7 +14234,18 @@ handle_request(struct mg_connection *conn)
 	}
 
 	/* 15. read a normal file with GET or HEAD */
-	handle_file_based_request(conn, path, &file);
+	printf("\r\nbased_req:%s",path);
+	//handle_file_based_request(conn, path, &file);
+	//hua
+	int a=0,len=0;
+	mg_printf(conn,
+	          "HTTP/1.1 200 OK\r\nContent-Type: "
+	          "text/html\r\nConnection: close\r\n\r\n");	
+		while(index_string_arr[a] != '\0'){
+			len=strlen(index_string_arr[a]);
+			mg_write(conn, index_string_arr[a], len);
+			a++;
+	}	
 #endif /* !defined(NO_FILES) */
 }
 
@@ -14299,6 +14313,7 @@ handle_file_based_request(struct mg_connection *conn,
 	                        strlen(conn->dom_ctx->config[CGI_EXTENSIONS]),
 	                        path)
 	           > 0) {
+		printf("\r\n---b1---");
 		if (is_in_script_path(conn, path)) {
 			/* CGI scripts may support all HTTP methods */
 			handle_cgi_request(conn, path);
@@ -14311,6 +14326,7 @@ handle_file_based_request(struct mg_connection *conn,
 	                        strlen(conn->dom_ctx->config[SSI_EXTENSIONS]),
 	                        path)
 	           > 0) {
+		printf("\r\n---b2---");
 		if (is_in_script_path(conn, path)) {
 			handle_ssi_file_request(conn, path, file);
 		} else {
@@ -14320,10 +14336,12 @@ handle_file_based_request(struct mg_connection *conn,
 #if !defined(NO_CACHING)
 	} else if ((!conn->in_error_handler)
 	           && is_not_modified(conn, &file->stat)) {
+		printf("\r\n---b3---");
 		/* Send 304 "Not Modified" - this must not send any body data */
 		handle_not_modified_static_file_request(conn, file);
 #endif /* !NO_CACHING */
 	} else {
+		printf("\r\n---b4---");
 		handle_static_file_request(conn, path, file, NULL, NULL);
 	}
 }
