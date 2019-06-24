@@ -13949,7 +13949,7 @@ handle_request(struct mg_connection *conn)
 		/* 6.3. This is either a OPTIONS, GET, HEAD or POST request,
 		 * or it is a PUT or DELETE request to a resource that does not
 		 * correspond to a file. Check authorization. */
-		printf("\r\n a6.3");
+		printf("\r\n a6.3 path:%s",path);
 		if (!check_authorization(conn, path)) {
 			send_authorization_request(conn, NULL);
 			return;
@@ -18598,6 +18598,7 @@ mg_start(const struct mg_callbacks *callbacks,
 /* Document root */
 #if defined(NO_FILES)
 	if (ctx->dd.config[DOCUMENT_ROOT] != NULL) {
+		printf("\r\n ctx->dd.config[DOCUMENT_ROOT]:%s\n",ctx->dd.config[DOCUMENT_ROOT]);
 		mg_cry_ctx_internal(ctx, "%s", "Document root must not be set");
 		free_context(ctx);
 		pthread_setspecific(sTlsKey, NULL);

@@ -14,7 +14,7 @@ CIVETWEB_LIB = libcivetweb.a
 
 #CFLAGS = -I$(TOP)/include $(COPT) -DUSE_WEBSOCKET -DUSE_IPV6
 
-CFLAGS = -I$(TOP)/include -Wall -I./ -DUSE_WEBSOCKET  -DNO_SSL 
+CFLAGS = -I$(TOP)/include $(COPT) -Wall -I./ -DUSE_WEBSOCKET  -DNO_SSL 
 LIBS = -lpthread
 
 include $(TOP)/resources/Makefile.in-os
@@ -26,7 +26,8 @@ endif
 all: $(PROG)
 
 $(PROG): $(CIVETWEB_LIB) $(SRC)
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(SRC) $(CIVETWEB_LIB) $(LIBS) -lcrypto -lssl -DUSE_SSL_DH=1
+	#$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(SRC) $(CIVETWEB_LIB) $(LIBS) -lcrypto -lssl -DUSE_SSL_DH=1
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(SRC) $(CIVETWEB_LIB) $(LIBS)
 
 $(CIVETWEB_LIB):
 	#$(MAKE) -C $(TOP) WITH_IPV6=1 WITH_WEBSOCKET=1 COPT='-DNO_SSL_DL=1' clean lib

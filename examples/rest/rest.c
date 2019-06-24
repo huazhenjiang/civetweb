@@ -28,9 +28,36 @@
 
 #define EXAMPLE_URI "/example"
 #define EXIT_URI "/exit"
+#define SHOW_INDEX "/showindex"
 
 int exitNow = 0;
 
+
+const char *index_string_arr[]={
+"<html>\n",
+"<head>\n",
+"<title>Civetweb: It Works!</title>\n",
+"</head>\n",
+"<body>\n",
+"<div style=\"float:right; width:100%; text-align:center;\">\n",
+"</div>\n",
+"<div style=\"float:left; height:50%; margin-bottom:-200px;\"></div>\n",
+"<div style=\"clear:both; height:400px; width:400px; margin: auto; position:relative;\">\n",
+"<img src=\"civetweb_64x64.png\" alt=\"logo\"/>\n",
+"<p>\n",
+"<b style=\"font-size:larger\"><a style=\"text-decoration:none\" href=\"https://sourceforge.net/projects/civetweb/\">Civetweb</a></b><br>\n",
+"<i>Your web server</i>\n",
+"<ul>\n",
+"<li><a href=\"https://github.com/civetweb/civetweb/blob/master/docs/UserManual.md\">User Manual</a></li>\n",
+"<li><a href=\"https://github.com/civetweb/civetweb/blob/master/RELEASE_NOTES.md\">Release Notes</a></li>\n",
+"<li><a href=\"https://sourceforge.net/projects/civetweb/\">Downloads</a></li>\n",
+"<li><a href=\"https://github.com/civetweb/civetweb\">GitHub</a></li>\n",
+"</ul>\n",
+"</p>\n",
+"</div>\n",
+"</body>\n",
+"</html>\n"
+};
 
 static int
 SendJSON(struct mg_connection *conn, cJSON *json_obj)
@@ -197,6 +224,32 @@ ExitHandler(struct mg_connection *conn, void *cbdata)
 	return 1;
 }
 
+int
+ShowIndexHandler(struct mg_connection *conn, void *cbdata)
+{
+	int i=0,len=0;
+	mg_printf(conn,
+	          "HTTP/1.1 200 OK\r\nContent-Type: "
+	          "text/html\r\nConnection: close\r\n\r\n");
+
+	/* Send HTTP message header */
+	//mg_send_http_ok(conn, "application/json; charset=utf-8", json_str_len);
+
+	/* Send HTTP message content */
+	//mg_write(conn, json_str, json_str_len);
+
+	while(index_string_arr[i] != '\0'){
+		len=strlen(index_string_arr[i]);
+		mg_write(conn, index_string_arr[i], len);
+		i++;
+	}
+	//printf("\r\n%d",i);
+	//mg_printf(conn, "Server will shut down.\n");
+	//mg_printf(conn, "Bye!\n");
+	//exitNow = 1;
+	return 1;
+}
+
 
 int
 log_message(const struct mg_connection *conn, const char *message)
@@ -269,6 +322,7 @@ main(int argc, char *argv[])
 	/* Add handler EXAMPLE_URI, to explain the example */
 	mg_set_request_handler(ctx, EXAMPLE_URI, ExampleHandler, 0);
 	mg_set_request_handler(ctx, EXIT_URI, ExitHandler, 0);
+	mg_set_request_handler(ctx, SHOW_INDEX, ShowIndexHandler, 0);
 
 	/* Show sone info */
 	printf("Start example: %s%s\n", HOST_INFO, EXAMPLE_URI);

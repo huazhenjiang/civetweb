@@ -13,7 +13,8 @@ SRC = rest.c cJSON/cJSON.c cJSON/cJSON_Utils.c
 TOP = ../..
 CIVETWEB_LIB = libcivetweb.a
 
-CFLAGS = -I$(TOP)/include -IcJSON $(COPT) -DNO_FILES
+#CFLAGS = -I$(TOP)/include -IcJSON $(COPT) -DNO_FILES
+CFLAGS = -I$(TOP)/include -IcJSON $(COPT) -DNO_FILES -DNO_SSL
 LIBS = -lpthread
 
 include $(TOP)/resources/Makefile.in-os
@@ -25,10 +26,12 @@ endif
 all: $(PROG)
 
 $(PROG): $(CIVETWEB_LIB) $(SRC)
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(SRC) $(CIVETWEB_LIB) $(LIBS) -lcrypto -lssl -DUSE_SSL_DH=1
+	#$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(SRC) $(CIVETWEB_LIB) $(LIBS) -lcrypto -lssl -DUSE_SSL_DH=1
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(SRC) $(CIVETWEB_LIB) $(LIBS)
 
 $(CIVETWEB_LIB):
-	$(MAKE) -C $(TOP) WITH_IPV6=1 WITH_WEBSOCKET=1 COPT='-DNO_SSL_DL=1' clean lib
+	#$(MAKE) -C $(TOP) WITH_IPV6=1 WITH_WEBSOCKET=1 COPT='-DNO_SSL_DL=1' clean lib
+	$(MAKE) -C $(TOP) WITH_WEBSOCKET=1 COPT='-DNO_SSL' clean lib
 	cp $(TOP)/$(CIVETWEB_LIB) .
 
 clean:
