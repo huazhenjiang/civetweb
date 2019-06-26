@@ -174,3 +174,4 @@ Using the CivetWeb project ensures the MIT licenses terms are applied and
 GPL cannot be imposed on any of this code, as long as it is sourced from
 here. This code will remain free with the MIT license protection.
 
+# civetweb

@@ -14517,6 +14517,7 @@ handle_request(struct mg_connection *conn)
 		/* 6.3. This is either a OPTIONS, GET, HEAD or POST request,
 		 * or it is a PUT or DELETE request to a resource that does not
 		 * correspond to a file. Check authorization. */
+		//hua
 		printf("\r\n a6.3 path:%s",path);
 		if (!check_authorization(conn, path)) {
 			send_authorization_request(conn, NULL);
@@ -14876,6 +14877,7 @@ handle_request(struct mg_connection *conn)
 	}
 #endif
 
+
 #endif /* !defined(NO_FILES) */
 }
 
@@ -14943,6 +14945,7 @@ handle_file_based_request(struct mg_connection *conn,
 	                        strlen(conn->dom_ctx->config[CGI_EXTENSIONS]),
 	                        path)
 	           > 0) {
+		printf("\r\n---b1---");
 		if (is_in_script_path(conn, path)) {
 			/* CGI scripts may support all HTTP methods */
 			handle_cgi_request(conn, path);
@@ -14955,6 +14958,7 @@ handle_file_based_request(struct mg_connection *conn,
 	                        strlen(conn->dom_ctx->config[SSI_EXTENSIONS]),
 	                        path)
 	           > 0) {
+		printf("\r\n---b2---");
 		if (is_in_script_path(conn, path)) {
 			handle_ssi_file_request(conn, path, file);
 		} else {
@@ -14964,6 +14968,7 @@ handle_file_based_request(struct mg_connection *conn,
 #if !defined(NO_CACHING)
 	} else if ((!conn->in_error_handler)
 	           && is_not_modified(conn, &file->stat)) {
+		printf("\r\n---b3---");
 		/* Send 304 "Not Modified" - this must not send any body data */
 		handle_not_modified_static_file_request(conn, file);
 #endif /* !NO_CACHING */
