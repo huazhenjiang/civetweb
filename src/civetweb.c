@@ -7866,7 +7866,7 @@ interpret_uri(struct mg_connection *conn, /* in/out: request (must be valid) */
 	mg_snprintf(
 	    conn, &truncated, filename, filename_buf_len - 1, "%s%s", root, uri);
 
-	printf("\r\n 1.filename:-%s-\n",filename);
+	printf("\r\n interpret_uri:-%s-\n",filename);
 	if (truncated) {
 		goto interpret_cleanup;
 	}
@@ -10073,7 +10073,7 @@ handle_static_file_request(struct mg_connection *conn,
 	int is_head_request;
 
 
-	printf("\r\nhandle_static_file_request():%s",path);
+	printf("\r\nhandle_static_file_request():%s\n",path);
 #if defined(USE_ZLIB)
 	/* Compression is allowed, unless there is a reason not to use compression.
 	 * If the file is already compressed, too small or a "range" request was
@@ -10088,18 +10088,22 @@ handle_static_file_request(struct mg_connection *conn,
 	is_head_request = !strcmp(conn->request_info.request_method, "HEAD");
 
 	if (mime_type == NULL) {
+		printf("[a]");
 		get_mime_type(conn, path, &mime_vec);
 	} else {
+		printf("[b]");
 		mime_vec.ptr = mime_type;
 		mime_vec.len = strlen(mime_type);
 	}
 	if (filep->stat.size > INT64_MAX) {
+		printf("[c]");
 		mg_send_http_error(conn,
 		                   500,
 		                   "Error: File size is too large to send\n%" INT64_FMT,
 		                   filep->stat.size);
 		return;
 	}
+	printf("[d]");
 	cl = (int64_t)filep->stat.size;
 	conn->status_code = 200;
 	range[0] = '\0';
@@ -10118,9 +10122,11 @@ handle_static_file_request(struct mg_connection *conn,
 
 	/* For gzipped files, add *.gz */
 	if (filep->stat.is_gzipped) {
+		printf("[e]");
 		mg_snprintf(conn, &truncated, gz_path, sizeof(gz_path), "%s.gz", path);
 
 		if (truncated) {
+			printf("[f]");
 			mg_send_http_error(conn,
 			                   500,
 			                   "Error: Path of zipped file too long (%s)",
@@ -10128,6 +10134,7 @@ handle_static_file_request(struct mg_connection *conn,
 			return;
 		}
 
+		printf("[g]");
 		path = gz_path;
 		encoding = "Content-Encoding: gzip\r\n";
 
@@ -10137,12 +10144,14 @@ handle_static_file_request(struct mg_connection *conn,
 #endif
 	} else if ((conn->accept_gzip) && (range_hdr == NULL)
 	           && (filep->stat.size >= MG_FILE_COMPRESSION_SIZE_LIMIT)) {
+		printf("[h]");
 		struct mg_file_stat file_stat;
 
 		mg_snprintf(conn, &truncated, gz_path, sizeof(gz_path), "%s.gz", path);
 
 		if (!truncated && mg_stat(conn, gz_path, &file_stat)
 		    && !file_stat.is_directory) {
+			printf("[i]");
 			file_stat.is_gzipped = 1;
 			filep->stat = file_stat;
 			cl = (int64_t)filep->stat.size;
@@ -10155,8 +10164,9 @@ handle_static_file_request(struct mg_connection *conn,
 #endif
 		}
 	}
-
+	printf("[j]");
 	if (!mg_fopen(conn, path, MG_FOPEN_MODE_READ, filep)) {
+		printf("[k]");
 		mg_send_http_error(conn,
 		                   500,
 		                   "Error: Cannot open file\nfopen(%s): %s",
@@ -10164,7 +10174,7 @@ handle_static_file_request(struct mg_connection *conn,
 		                   strerror(ERRNO));
 		return;
 	}
-
+	printf("[l]");
 	fclose_on_exec(&filep->access, conn);
 
 	/* If "Range" request was made: parse header, send only selected part
@@ -10173,9 +10183,11 @@ handle_static_file_request(struct mg_connection *conn,
 	if ((range_hdr != NULL)
 	    && ((n = parse_range_header(range_hdr, &r1, &r2)) > 0) && (r1 >= 0)
 	    && (r2 >= 0)) {
+		printf("[m]");	
 		/* actually, range requests don't play well with a pre-gzipped
 		 * file (since the range is specified in the uncompressed space) */
 		if (filep->stat.is_gzipped) {
+			printf("[n]");
 			mg_send_http_error(
 			    conn,
 			    416, /* 416 = Range Not Satisfiable */
@@ -10185,6 +10197,7 @@ handle_static_file_request(struct mg_connection *conn,
 			    &filep->access); /* ignore error on read only file */
 			return;
 		}
+		printf("[o]");
 		conn->status_code = 206;
 		cl = (n == 2) ? (((r2 > cl) ? cl : r2) - r1 + 1) : (cl - r1);
 		mg_snprintf(conn,
@@ -10203,7 +10216,7 @@ handle_static_file_request(struct mg_connection *conn,
 		allow_on_the_fly_compression = 0;
 #endif
 	}
-
+	printf("[p]");
 /* Do not compress small files. Small files do not benefit from file
  * compression, but there is still some overhead. */
 #if defined(USE_ZLIB)
@@ -10217,6 +10230,7 @@ handle_static_file_request(struct mg_connection *conn,
 	cors_orig_cfg = conn->dom_ctx->config[ACCESS_CONTROL_ALLOW_ORIGIN];
 	origin_hdr = mg_get_header(conn, "Origin");
 	if (cors_orig_cfg && *cors_orig_cfg && origin_hdr) {
+		printf("[q]");
 		/* Cross-origin resource sharing (CORS), see
 		 * http://www.html5rocks.com/en/tutorials/cors/,
 		 * http://www.html5rocks.com/static/images/cors_server_flowchart.png
@@ -10226,9 +10240,10 @@ handle_static_file_request(struct mg_connection *conn,
 		cors2 = cors_orig_cfg;
 		cors3 = "\r\n";
 	} else {
+		printf("[r]");
 		cors1 = cors2 = cors3 = "";
 	}
-
+	printf("[s]");
 	/* Prepare Etag, Date, Last-Modified headers. Must be in UTC,
 	 * according to
 	 * http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3 */
@@ -10270,6 +10285,7 @@ handle_static_file_request(struct mg_connection *conn,
 	} else
 #endif
 	{
+		printf("[t]");
 		/* Without on-the-fly compression, we know the content-length
 		 * and we can use ranges (with on-the-fly compression we cannot).
 		 * So we send these response headers only in this case. */
@@ -10282,19 +10298,22 @@ handle_static_file_request(struct mg_connection *conn,
 		                range,
 		                encoding);
 	}
-
+	printf("[u]");
 	/* The previous code must not add any header starting with X- to make
 	 * sure no one of the additional_headers is included twice */
 	if (additional_headers != NULL) {
+		printf("[v]");
 		(void)mg_printf(conn,
 		                "%.*s\r\n\r\n",
 		                (int)strlen(additional_headers),
 		                additional_headers);
 	} else {
+		printf("[w]");
 		(void)mg_printf(conn, "\r\n");
 	}
 
 	if (!is_head_request) {
+		printf("[x]");
 #if defined(USE_ZLIB)
 		if (allow_on_the_fly_compression) {
 			/* Compress and send */
@@ -10302,10 +10321,89 @@ handle_static_file_request(struct mg_connection *conn,
 		} else
 #endif
 		{
+			printf("[y]");
+#if 0
 			/* Send file directly */
-			send_file_data(conn, filep, r1, cl);		
+			//send_file_data(conn, filep, r1, cl);
+#else			
+			//hua
+			int a=0;
+			unsigned long length;
+			char *ptr;
+			
+			//printf("\r\nGET path:%s",path);
+			if( ptr=strstr(path,"/css") ){		
+				if(ptr=strstr(path,"/bootstrap.min.css")){
+					while(bootstrap_min_css[a] != '\0'){
+						length = strlen(bootstrap_min_css[a]);
+						output_body(conn, bootstrap_min_css[a], length);
+						a++;
+					}
+				}
+				else if(ptr=strstr(path,"/switch.css")){
+					while(switch_css[a] != '\0'){
+						length = strlen(switch_css[a]);
+						output_body(conn, switch_css[a], length);
+						a++;
+					}						
+				}
+				else if(ptr=strstr(path,"/bootstrap-slider.min.css")){
+					while(bootstrap_slider_min_css[a] != '\0'){
+						length = strlen(bootstrap_slider_min_css[a]);
+						output_body(conn, bootstrap_slider_min_css[a], length);
+						a++;
+					}										
+				}
+				else if(ptr=strstr(path,"/jquery.bootstrap-touchspin.css")){	
+					while(jquery_bootstrap_touchspin_css[a] != '\0'){
+						length = strlen(jquery_bootstrap_touchspin_css[a]);
+						output_body(conn, jquery_bootstrap_touchspin_css[a], length);
+						a++;
+					}			
+				}				
+			}
+			else if(ptr=strstr(path,"/js")){	
+				if(ptr=strstr(path,"/jquery.min.js")){
+					while(jquery_min_js[a] != '\0'){
+						length = strlen(jquery_min_js[a]);
+						output_body(conn, jquery_min_js[a], length);
+						a++;
+					}			
+				}
+				else if(ptr=strstr(path,"/bootstrap.min.js")){
+					while(bootstrap_min_js[a] != '\0'){
+						length = strlen(bootstrap_min_js[a]);
+						output_body(conn, bootstrap_min_js[a], length);
+						a++;
+					}			
+				}
+				else if(ptr=strstr(path,"/bootstrap-slider.min.js")){
+					while(bootstrap_slider_min_js[a] != '\0'){
+						length = strlen(bootstrap_slider_min_js[a]);
+						output_body(conn, bootstrap_slider_min_js[a], length);
+						a++;
+					}				
+				}
+				else if(ptr=strstr(path,"/jquery.bootstrap-touchspin.js")){
+					while(jquery_bootstrap_touchspin_js[a] != '\0'){
+						length = strlen(jquery_bootstrap_touchspin_js[a]);
+						output_body(conn, jquery_bootstrap_touchspin_js[a], length);
+						a++;
+					}									
+				}
+			}
+			else{
+				//index		
+				while(index_string_arr[a] != '\0'){
+					length = strlen(index_string_arr[a]);
+					output_body(conn, index_string_arr[a], length);
+					a++;
+				}				
+			}
+#endif			
 		}
 	}
+	printf("[z]");
 	(void)mg_fclose(&filep->access); /* ignore error on read only file */
 }
 
@@ -14422,6 +14520,7 @@ handle_request(struct mg_connection *conn)
 		printf("\r\n a6.3 path:%s",path);
 		if (!check_authorization(conn, path)) {
 			send_authorization_request(conn, NULL);
+			printf("\r\n[Ret]");
 			return;
 		}
 	}
