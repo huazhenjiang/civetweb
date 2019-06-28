@@ -66,6 +66,7 @@ endif
 
 # only set main compile options if none were chosen
 #CFLAGS += -Wall -Wextra -Wshadow -Wformat-security -Winit-self -Wmissing-prototypes -D$(TARGET_OS) -Iinclude $(COPT) -DUSE_STACK_SIZE=$(USE_STACK_SIZE)
+# did not set -DNO_FILES -DNO_FILESYSTEMS
 CFLAGS += -Wall -Wextra -Wshadow -Wformat-security -Winit-self -Wmissing-prototypes -D$(TARGET_OS) -Iinclude $(COPT) -DUSE_STACK_SIZE=$(USE_STACK_SIZE) -DUSE_WEBSOCKET -DNO_SSL
 
 LIBS = -lpthread -lm

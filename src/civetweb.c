@@ -167,6 +167,7 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 /* Include the header file here, so the CivetWeb interface is defined for the
  * entire implementation, including the following forward definitions. */
 #include "civetweb.h"
+//#define NO_FILES
 #define STRING_WEB
 #if defined(STRING_WEB)
 #include "stringweb.h"
