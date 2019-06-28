@@ -42,17 +42,17 @@ DOCUMENT_ROOT = $(HTMLDIR)
 PORTS = 8080
 USE_STACK_SIZE ?= 102400
 
-BUILD_DIRS = $(BUILD_DIR) $(BUILD_DIR)/src $(BUILD_DIR)/resources
+BUILD_DIRS = $(BUILD_DIR) $(BUILD_DIR)/src $(BUILD_DIR)/resources $(BUILD_DIR)/src/stringweb
 
 LIB_SOURCES = src/civetweb.c
 LIB_INLINE  = src/mod_lua.inl src/md5.inl
-APP_SOURCES = src/main.c
+APP_SOURCES = src/main.c $(wildcard src/stringweb/*.c)
 WINDOWS_RESOURCES = resources/res.rc
 UNIT_TEST_SOURCES = test/unit_test.c
 SOURCE_DIRS =
 
 OBJECTS = $(LIB_SOURCES:.c=.o) $(APP_SOURCES:.c=.o)
-HEADERS = include/civetweb.h
+HEADERS = include/civetweb.h include/stringweb.h
 BUILD_RESOURCES =
 
 # The unit tests include the source files directly to get visibility to the

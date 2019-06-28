@@ -167,6 +167,11 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 /* Include the header file here, so the CivetWeb interface is defined for the
  * entire implementation, including the following forward definitions. */
 #include "civetweb.h"
+#define STRING_WEB
+#if defined(STRING_WEB)
+#include "stringweb.h"
+#endif
+
 #endif
 
 #if !defined(DEBUG_TRACE)
@@ -2207,36 +2212,18 @@ static struct ssl_func crypto_sw[] = {{"CRYPTO_num_locks", NULL},
 #endif /* NO_SSL */
 
 //hua
-/* 
-const char *index_string_arr[]={
-"<html>\n",
-"<head>\n",
-"<title>Huazhen test!</title>\n",
-"</head>\n",
-"<body>\n",
-"<div style=\"float:right; width:100%; text-align:center;\">\n",
-"</div>\n",
-"<div style=\"float:left; height:50%; margin-bottom:-200px;\"></div>\n",
-"<div style=\"clear:both; height:400px; width:400px; margin: auto; position:relative;\">\n",
-"<img src=\"civetweb_64x64.png\" alt=\"logo\"/>\n",
-"<p>\n",
-"<b style=\"font-size:larger\"><a style=\"text-decoration:none\" href=\"https://sourceforge.net/projects/civetweb/\">Hua testing</a></b><br>\n",
-"<i>Your web server</i>\n",
-"<ul>\n",
-"<li><a href=\"https://github.com/civetweb/civetweb/blob/master/docs/UserManual.md\">User Manual</a></li>\n",
-"<li><a href=\"https://github.com/civetweb/civetweb/blob/master/RELEASE_NOTES.md\">Release Notes</a></li>\n",
-"<li><a href=\"https://sourceforge.net/projects/civetweb/\">Downloads</a></li>\n",
-"<li><a href=\"https://github.com/civetweb/civetweb\">GitHub</a></li>\n",
-"</ul>\n",
-"</p>\n",
-"</div>\n",
-"</body>\n",
-"</html>\n"
-};
+/*
+	bootstrap.min.css
+	switch.css
+	bootstrap-slider.min.css
+	jquery.bootstrap-touchspin.css
+	jquery.min.js
+	bootstrap.min.js
+	bootstrap-slider.min.js
+	jquery.bootstrap-touchspin.js
 */
-const char *index_string_arr[]={
-//"3c68746d6c3e0a3c686561643e0a3c7469746c653e4875617a68656e3a2054657374696e6720506167653c2f7469746c653e0a3c2f686561643e0a3c626f64793e0a0a3c646976207374796c653d22666c6f61743a72696768743b2077696474683a313030253b20746578742d616c69676e3a63656e7465723b223e0a3c2f6469763e0a3c646976207374796c653d22666c6f61743a6c6566743b206865696768743a3530253b206d617267696e2d626f74746f6d3a2d32303070783b223e3c2f6469763e0a3c646976207374796c653d22636c6561723a626f74683b206865696768743a34303070783b2077696474683a34303070783b206d617267696e3a206175746f3b20706f736974696f6e3a72656c61746976653b223e0a3c696d67207372633d2263697665747765625f36347836342e706e672220616c743d226c6f676f222f3e0a3c703e0a0a0a3c62207374796c653d22666f6e742d73697a653a6c6172676572223e3c61207374796c653d22746578742d6465636f726174696f6e3a6e6f6e652220687265663d2268747470733a2f2f736f75726365666f7267652e6e65742f70726f6a656374732f63697665747765622f223e4875612074657374696e673c2f613e3c2f623e3c62723e0a3c693e596f757220776562207365727665723c2f693e0a3c756c3e0a0a0a3c6c693e3c6120687265663d2268747470733a2f2f6769746875622e636f6d2f63697665747765622f63697665747765622f626c6f622f6d61737465722f646f63732f557365724d616e75616c2e6d64223e55736572204d616e75616c3c2f613e3c2f6c693e0a3c6c693e3c6120687265663d2268747470733a2f2f6769746875622e636f6d2f63697665747765622f63697665747765622f626c6f622f6d61737465722f52454c454153455f4e4f5445532e6d64223e52656c65617365204e6f7465733c2f613e3c2f6c693e0a3c6c693e3c6120687265663d2268747470733a2f2f736f75726365666f7267652e6e65742f70726f6a656374732f63697665747765622f223e446f776e6c6f6164733c2f613e3c2f6c693e0a3c6c693e3c6120687265663d2268747470733a2f2f6769746875622e636f6d2f63697665747765622f6369766574776562223e4769744875623c2f613e3c2f6c693e0a3c2f756c3e0a3c2f703e0a0a0a3c2f6469763e0a0a0a3c2f626f64793e0a3c2f68746d6c3e0a",
-
+/* 
+const char *index_html[]={	
 "3c68746d6c206c616e673d22656e223e0a3c686561643e0a20203c7469746c653e495043616d2044657669636520546573743c2f7469746c653e0a20203c6d65746120636861727365743d227574662d38223e0a20203c6d657461206e616d653d2276696577706f72742220636f6e74656e743d2277696474683d6465766963652d77696474682c20696e697469616c2d7363616c653d31223e0a0a20203c6c696e6b20747970653d22746578742f6373732220687265663d226373732f626f6f7473747261702e6d696e2e637373222072656c3d227374796c65736865657422202f3e0a20203c6c696e6b20747970653d22746578742f6373732220687265663d226373732f7377697463682e637373222072656c3d227374796c65736865657422202f3e0a20203c6c696e6b20747970653d22746578742f6373732220687265663d226373732f626f6f7473747261702d736c696465722e6d696e2e637373222072656c3d227374796c65736865657422202f3e0a20203c6c696e6b20747970653d22746578742f6373732220687265663d226373732f6a71756572792e626f6f7473747261702d746f7563687370696e2e637373222072656c3d227374796c6573686565742220206d656469613d22616c6c223e0a20203c736372697074207372633d226a732f6a71756572792e6d696e2e6a73223e3c2f7363726970743e0a20203c736372697074207372633d226a732f626f6f7473747261702e6d696e2e6a73223e3c2f7363726970743e0a20203c736372697074207372633d226a732f626f6f7473747261702d736c696465722e6d696e2e6a73223e3c2f7363726970743e0a20203c736372697074207372633d226a732f6a71756572792e626f6f7473747261702d746f7563687370696e2e6a73223e3c2f7363726970743e0a20203c7374796c653e0a0a20203c2f7374796c653e0a0a3c2f686561643e0a3c626f64793e0a0a3c64697620636c6173733d22636f6e7461696e657220746578742d63656e746572223e0a20203c64697620636c6173733d22726f77223e0a202020203c64697620636c6173733d22636f6c2d736d2d3130223e0a0a2020202020203c64697620636c6173733d22726f77223e0a20202020202020203c64697620636c6173733d22636f6c2d736d2d3132223e0a202020202020202020203c64697620636c6173733d2270616e656c2070616e656c2d64656661756c7420746578742d6c656674223e0a2020202020202020202020203c64697620636c6173733d2270616e656c2d626f6479223e0a20202020202020202020202020203c63656e7465723e3c48333e495043616d2044657669636520546573743c2f48333e3c2f63656e7465723e3c62723e0a20202020202020202020202020203c63656e",
 "7465723e76657273696f6e3a3c7370616e2069643d2266775f766572223e3c2f7370616e3e3c2f63656e7465723e0a2020202020202020202020203c2f6469763e0a202020202020202020203c2f6469763e0a20202020202020203c2f6469763e0a2020202020203c2f6469763e0a3c212d2d205374617274206f6620496d61676520526f77202d2d3e0a3c64697620636c6173733d22726f77223e0a20203c64697620636c6173733d22636f6c2d736d2d3132223e0a202020203c64697620636c6173733d2277656c6c223e0a20202020203c696d672069643d22766964656f22207372633d222f70742f766964656f2f736e617073686f742220206865696768743d22353025222077696474683d22353025223e0a202020203c2f6469763e0a20203c2f6469763e0a3c2f6469763e0a3c212d2d20456e64206f6620496d61676520526f77202d2d3e0a0a3c212d2d205374617274206f66205461627320526f77202d2d3e0a3c64697620636c6173733d22726f77223e0a20203c212d2d204e61762074616273202d2d3e0a20203c756c20636c6173733d226e6176206e61762d746162732220726f6c653d227461626c697374223e0a202020203c6c6920636c6173733d22616374697665223e3c6120687265663d2223696e666f726d6174696f6e2220726f6c653d227461622220646174612d746f67676c653d22746162223e496e666f726d6174696f6e3c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d22237274632220726f6c653d227461622220646174612d746f67676c653d22746162223e5254433c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d22234c45442220726f6c653d227461622220646174612d746f67676c653d22746162223e4c45443c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d22234943522220726f6c653d227461622220646174612d746f67676c653d22746162223e49522d4375743c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d222349524c45442220726f6c653d227461622220646174612d746f67676c653d22746162223e4952204c45443c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d2223414c532220726f6c653d227461622220646174612d746f67676c653d22746162223e4c696768742053656e736f723c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d2223415544494f2220726f6c653d227461622220646174612d746f67676c653d22746162223e417564696f3c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d222353442220726f6c653d227461622220646174612d746f67676c653d22746162223e534420436172643c2f613e3c2f6c693e0a202020203c6c693e",
 "3c6120687265663d22234d4f544f522220726f6c653d227461622220646174612d746f67676c653d22746162223e466f6375732f5a6f6f6d3c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d222341444d494e2220726f6c653d227461622220646174612d746f67676c653d22746162223e41646d696e3c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d22234e4554574f524b2220726f6c653d227461622220646174612d746f67676c653d22746162223e4e6574776f726b3c2f613e3c2f6c693e0a202020203c6c693e3c6120687265663d2223534e415053484f542220726f6c653d227461622220646174612d746f67676c653d22746162223e536e617073686f743c2f613e3c2f6c693e0a20203c2f756c3e0a0a20203c64697620636c6173733d227461622d636f6e74656e74223e0a202020203c212d2d205374617274206f6620496e666f726d6174696f6e202d2d3e0a202020203c64697620636c6173733d227461622d70616e6520616374697665222069643d22696e666f726d6174696f6e223e0a2020202020203c64697620636c6173733d22726f77223e0a20202020202020203c64697620636c6173733d22636f6c2d736d2d3132223e0a202020202020202020203c64697620636c6173733d2277656c6c223e0a202020202020202020202020202020203c64697620636c6173733d22726f77223e0a20202020202020202020202020202020202020203c64697620636c6173733d22696e7075742d67726f7570223e0a202020202020202020202020202020202020202020203c7370616e20636c6173733d22696e7075742d67726f75702d6164646f6e223e525453502055524c3c2f7370616e3e0a202020202020202020202020202020202020202020203c696e7075742069643d22727473705f75726c5f312220747970653d22746578742220636c6173733d22666f726d2d636f6e74726f6c22206e616d653d22727473705f75726c5f312220726561646f6e6c793d22726561646f6e6c7922203e0a202020202020202020202020202020202020202020203c696e7075742069643d22727473705f75726c5f322220747970653d22746578742220636c6173733d22666f726d2d636f6e74726f6c22206e616d653d22727473705f75726c5f322220726561646f6e6c793d22726561646f6e6c7922203e0a202020202020202020202020202020202020202020203c696e7075742069643d22727473705f75726c5f332220747970653d22746578742220636c6173733d22666f726d2d636f6e74726f6c22206e616d653d22727473705f75726c5f332220726561646f6e6c793d22726561646f6e6c7922203e0a20202020202020202020202020202020202020203c2f6469763e0a202020",
@@ -2278,17 +2265,6 @@ const char *index_string_arr[]={
 
 };
 
-
-/*
-	bootstrap.min.css
-	switch.css
-	bootstrap-slider.min.css
-	jquery.bootstrap-touchspin.css
-	jquery.min.js
-	bootstrap.min.js
-	bootstrap-slider.min.js
-	jquery.bootstrap-touchspin.js
-*/
 const char *bootstrap_min_css[]={
 
 "2f2a210a202a20426f6f7473747261702076332e332e372028687474703a2f2f676574626f6f7473747261702e636f6d290a202a20436f7079726967687420323031312d3230313620547769747465722c20496e632e0a202a204c6963656e73656420756e646572204d4954202868747470733a2f2f6769746875622e636f6d2f747762732f626f6f7473747261702f626c6f622f6d61737465722f4c4943454e5345290a202a2f2f2a21206e6f726d616c697a652e6373732076332e302e33207c204d4954204c6963656e7365207c206769746875622e636f6d2f6e65636f6c61732f6e6f726d616c697a652e637373202a2f68746d6c7b666f6e742d66616d696c793a73616e732d73657269663b2d7765626b69742d746578742d73697a652d61646a7573743a313030253b2d6d732d746578742d73697a652d61646a7573743a313030257d626f64797b6d617267696e3a307d61727469636c652c61736964652c64657461696c732c66696763617074696f6e2c6669677572652c666f6f7465722c6865616465722c6867726f75702c6d61696e2c6d656e752c6e61762c73656374696f6e2c73756d6d6172797b646973706c61793a626c6f636b7d617564696f2c63616e7661732c70726f67726573732c766964656f7b646973706c61793a696e6c696e652d626c6f636b3b766572746963616c2d616c69676e3a626173656c696e657d617564696f3a6e6f74285b636f6e74726f6c735d297b646973706c61793a6e6f6e653b6865696768743a307d5b68696464656e5d2c74656d706c6174657b646973706c61793a6e6f6e657d617b6261636b67726f756e642d636f6c6f723a7472616e73706172656e747d613a6163746976652c613a686f7665727b6f75746c696e653a307d616262725b7469746c655d7b626f726465722d626f74746f6d3a31707820646f747465647d622c7374726f6e677b666f6e742d7765696768743a3730307d64666e7b666f6e742d7374796c653a6974616c69637d68317b6d617267696e3a2e3637656d20303b666f6e742d73697a653a32656d7d6d61726b7b636f6c6f723a233030303b6261636b67726f756e643a236666307d736d616c6c7b666f6e742d73697a653a3830257d7375622c7375707b706f736974696f6e3a72656c61746976653b666f6e742d73697a653a3735253b6c696e652d6865696768743a303b766572746963616c2d616c69676e3a626173656c696e657d7375707b746f703a2d2e35656d7d7375627b626f74746f6d3a2d2e3235656d7d696d677b626f726465723a307d7376673a6e6f74283a726f6f74297b6f766572666c6f773a68696464656e7d6669677572657b6d617267696e3a31656d20343070787d68727b6865696768743a303b2d7765626b69742d626f782d7369",
@@ -2641,7 +2617,7 @@ const char *jquery_bootstrap_touchspin_js[]={
 "202626202876616c7565203c2073657474696e67732e6d696e2929207b0a2020202020202020202076616c7565203d2073657474696e67732e6d696e3b0a202020202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e6d696e27293b0a2020202020202020202073746f705370696e28293b0a20202020202020207d0a0a2020202020202020656c656d656e74732e696e7075742e76616c2873657474696e67732e63616c6c6261636b5f61667465725f63616c63756c6174696f6e284e756d6265722876616c7565292e746f46697865642873657474696e67732e646563696d616c732929293b0a0a202020202020202069662028696e697476616c756520213d3d2076616c756529207b0a202020202020202020206f726967696e616c696e7075742e7472696767657228276368616e676527293b0a20202020202020207d0a2020202020207d0a0a20202020202066756e6374696f6e207374617274446f776e5370696e2829207b0a202020202020202073746f705370696e28293b0a0a20202020202020207370696e636f756e74203d20303b0a20202020202020207370696e6e696e67203d2027646f776e273b0a0a20202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e73746172747370696e27293b0a20202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e7374617274646f776e7370696e27293b0a0a2020202020202020646f776e44656c617954696d656f7574203d2073657454696d656f75742866756e6374696f6e2829207b0a20202020202020202020646f776e5370696e54696d6572203d20736574496e74657276616c2866756e6374696f6e2829207b0a2020202020202020202020207370696e636f756e742b2b3b0a202020202020202020202020646f776e4f6e636528293b0a202020202020202020207d2c2073657474696e67732e73746570696e74657276616c293b0a20202020202020207d2c2073657474696e67732e73746570696e74657276616c64656c6179293b0a2020202020207d0a0a20202020202066756e6374696f6e20737461727455705370696e2829207b0a202020202020202073746f705370696e28293b0a0a20202020202020207370696e636f756e74203d20303b0a20202020202020207370696e6e696e67203d20277570273b0a0a20202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e73746172747370696e27293b0a20202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e7374617274757073",
 "70696e27293b0a0a2020202020202020757044656c617954696d656f7574203d2073657454696d656f75742866756e6374696f6e2829207b0a2020202020202020202075705370696e54696d6572203d20736574496e74657276616c2866756e6374696f6e2829207b0a2020202020202020202020207370696e636f756e742b2b3b0a20202020202020202020202075704f6e636528293b0a202020202020202020207d2c2073657474696e67732e73746570696e74657276616c293b0a20202020202020207d2c2073657474696e67732e73746570696e74657276616c64656c6179293b0a2020202020207d0a0a20202020202066756e6374696f6e2073746f705370696e2829207b0a2020202020202020636c65617254696d656f757428646f776e44656c617954696d656f7574293b0a2020202020202020636c65617254696d656f757428757044656c617954696d656f7574293b0a2020202020202020636c656172496e74657276616c28646f776e5370696e54696d6572293b0a2020202020202020636c656172496e74657276616c2875705370696e54696d6572293b0a0a202020202020202073776974636820287370696e6e696e6729207b0a202020202020202020206361736520277570273a0a2020202020202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e73746f7075707370696e27293b0a2020202020202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e73746f707370696e27293b0a202020202020202020202020627265616b3b0a20202020202020202020636173652027646f776e273a0a2020202020202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e73746f70646f776e7370696e27293b0a2020202020202020202020206f726967696e616c696e7075742e747269676765722827746f7563687370696e2e6f6e2e73746f707370696e27293b0a202020202020202020202020627265616b3b0a20202020202020207d0a0a20202020202020207370696e636f756e74203d20303b0a20202020202020207370696e6e696e67203d2066616c73653b0a2020202020207d0a0a202020207d293b0a0a20207d3b0a0a7d29293b0a"
 };
-
+*/
 
 #if !defined(NO_CACHING)
 static const char month_names[][4] = {"Jan",
@@ -10048,6 +10024,34 @@ fclose_on_exec(struct mg_file_access *filep, struct mg_connection *conn)
 #include "mod_zlib.inl"
 #endif
 
+#if defined(STRING_WEB)
+void output_body(struct mg_connection *conn, char *body_str, unsigned long size){
+		unsigned long x=0;
+		unsigned char ten,one,sum;
+		if(size > 0){
+			while(x<size){
+				if((body_str[x] >= 0x30)&&(body_str[x] <= 0x39)){
+					ten =body_str[x]-'0';
+				}
+				else{
+					ten =body_str[x]-'a'+10;
+				}
+
+				if((body_str[x+1] >= 0x30)&&(body_str[x+1] <= 0x39)){
+					one =body_str[x+1]-'0';
+				}
+				else{
+					one =body_str[x+1]-'a'+10;
+				}			
+
+				sum = ten*16 + one;
+				mg_write(conn, &sum, 1);
+
+				x=x+2;
+			}			
+		}	
+}
+#endif
 
 #if !defined(NO_FILESYSTEMS)
 static void
@@ -10165,6 +10169,7 @@ handle_static_file_request(struct mg_connection *conn,
 		}
 	}
 	printf("[j]");
+#if !defined(STRING_WEB)	
 	if (!mg_fopen(conn, path, MG_FOPEN_MODE_READ, filep)) {
 		printf("[k]");
 		mg_send_http_error(conn,
@@ -10176,7 +10181,7 @@ handle_static_file_request(struct mg_connection *conn,
 	}
 	printf("[l]");
 	fclose_on_exec(&filep->access, conn);
-
+#endif
 	/* If "Range" request was made: parse header, send only selected part
 	 * of the file. */
 	r1 = r2 = 0;
@@ -10322,89 +10327,92 @@ handle_static_file_request(struct mg_connection *conn,
 #endif
 		{
 			printf("[y]");
-#if 0
-			/* Send file directly */
-			//send_file_data(conn, filep, r1, cl);
-#else			
-			//hua
-			int a=0;
+#if defined(STRING_WEB)
 			unsigned long length;
 			char *ptr;
 			
-			//printf("\r\nGET path:%s",path);
-			if( ptr=strstr(path,"/css") ){		
-				if(ptr=strstr(path,"/bootstrap.min.css")){
-					while(bootstrap_min_css[a] != '\0'){
-						length = strlen(bootstrap_min_css[a]);
-						output_body(conn, bootstrap_min_css[a], length);
-						a++;
-					}
+			if( (ptr=strstr(path,"/css")) ){		
+				if( (ptr=strstr(path,"/bootstrap.min.css")) ){
+					if(bootstrap_min_css[0] != '\0'){	
+						length = strlen(bootstrap_min_css);
+						output_body(conn, bootstrap_min_css, length);
+					}					
 				}
-				else if(ptr=strstr(path,"/switch.css")){
-					while(switch_css[a] != '\0'){
-						length = strlen(switch_css[a]);
-						output_body(conn, switch_css[a], length);
-						a++;
-					}						
+				else if( (ptr=strstr(path,"/switch.css")) ){
+					if(switch_css[0] != '\0'){	
+						length = strlen(switch_css);
+						output_body(conn, switch_css, length);
+					}											
 				}
-				else if(ptr=strstr(path,"/bootstrap-slider.min.css")){
-					while(bootstrap_slider_min_css[a] != '\0'){
-						length = strlen(bootstrap_slider_min_css[a]);
-						output_body(conn, bootstrap_slider_min_css[a], length);
-						a++;
-					}										
+				else if( (ptr=strstr(path,"/bootstrap-slider.min.css")) ){
+					if(bootstrap_slider_min_css[0] != '\0'){	
+						length = strlen(bootstrap_slider_min_css);
+						output_body(conn, bootstrap_slider_min_css, length);
+					}															
 				}
-				else if(ptr=strstr(path,"/jquery.bootstrap-touchspin.css")){	
-					while(jquery_bootstrap_touchspin_css[a] != '\0'){
-						length = strlen(jquery_bootstrap_touchspin_css[a]);
-						output_body(conn, jquery_bootstrap_touchspin_css[a], length);
-						a++;
-					}			
+				else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.css")) ){	
+					if(jquery_bootstrap_touchspin_css[0] != '\0'){	
+						length = strlen(jquery_bootstrap_touchspin_css);
+						output_body(conn, jquery_bootstrap_touchspin_css, length);
+					}								
 				}				
 			}
-			else if(ptr=strstr(path,"/js")){	
-				if(ptr=strstr(path,"/jquery.min.js")){
-					while(jquery_min_js[a] != '\0'){
-						length = strlen(jquery_min_js[a]);
-						output_body(conn, jquery_min_js[a], length);
-						a++;
-					}			
+			else if( (ptr=strstr(path,"/js")) ){	
+				if( (ptr=strstr(path,"/jquery.min.js")) ){
+					if(jquery_min_js[0] != '\0'){	
+						length = strlen(jquery_min_js);
+						output_body(conn, jquery_min_js, length);
+					}								
 				}
-				else if(ptr=strstr(path,"/bootstrap.min.js")){
-					while(bootstrap_min_js[a] != '\0'){
-						length = strlen(bootstrap_min_js[a]);
-						output_body(conn, bootstrap_min_js[a], length);
-						a++;
-					}			
+				else if( (ptr=strstr(path,"/bootstrap.min.js")) ){
+					if(bootstrap_min_js[0] != '\0'){	
+						length = strlen(bootstrap_min_js);
+						output_body(conn, bootstrap_min_js, length);
+					}								
 				}
-				else if(ptr=strstr(path,"/bootstrap-slider.min.js")){
-					while(bootstrap_slider_min_js[a] != '\0'){
-						length = strlen(bootstrap_slider_min_js[a]);
-						output_body(conn, bootstrap_slider_min_js[a], length);
-						a++;
-					}				
-				}
-				else if(ptr=strstr(path,"/jquery.bootstrap-touchspin.js")){
-					while(jquery_bootstrap_touchspin_js[a] != '\0'){
-						length = strlen(jquery_bootstrap_touchspin_js[a]);
-						output_body(conn, jquery_bootstrap_touchspin_js[a], length);
-						a++;
+				else if( (ptr=strstr(path,"/bootstrap-slider.min.js")) ){
+					if(bootstrap_slider_min_js[0] != '\0'){	
+						length = strlen(bootstrap_slider_min_js);
+						output_body(conn, bootstrap_slider_min_js, length);
 					}									
+				}
+				else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.js")) ){
+					if(jquery_bootstrap_touchspin_js[0] != '\0'){	
+						length = strlen(jquery_bootstrap_touchspin_js);
+						output_body(conn, jquery_bootstrap_touchspin_js, length);
+					}														
 				}
 			}
 			else{
-				//index		
-				while(index_string_arr[a] != '\0'){
-					length = strlen(index_string_arr[a]);
-					output_body(conn, index_string_arr[a], length);
-					a++;
+				if( (ptr=strstr(path,"/file_upload.html")) ){
+					if(file_upload_html[0] != '\0'){	
+						length = strlen(file_upload_html);
+						output_body(conn, file_upload_html, length);
+					}
 				}				
+				else if( (ptr=strstr(path,"/blank.html")) ){
+					if(blank_html[0] != '\0'){	
+						length = strlen(blank_html);
+						output_body(conn, blank_html, length);
+					}
+				}
+				else{
+					if(index_html[0] != '\0'){	
+						length = strlen(index_html);
+						output_body(conn, index_html, length);
+					}					
+				}		
 			}
+#else			
+			/* Send file directly */
+			send_file_data(conn, filep, r1, cl);
 #endif			
 		}
 	}
-	printf("[z]");
+#if !defined(STRING_WEB)	
+	//printf("[z]");
 	(void)mg_fclose(&filep->access); /* ignore error on read only file */
+#endif	
 }
 
 
@@ -14211,37 +14219,6 @@ deprecated_websocket_data_wrapper(struct mg_connection *conn,
 }
 #endif
 
-
-//hua
-output_body(struct mg_connection *conn, char *body_str, unsigned long size){
-
-		unsigned long x=0;
-		unsigned char ten,one,sum;
-		if(size > 0){
-			while(x<size){
-				if((body_str[x] >= 0x30)&&(body_str[x] <= 0x39)){
-					ten =body_str[x]-'0';
-				}
-				else{
-					ten =body_str[x]-'a'+10;
-				}
-
-				if((body_str[x+1] >= 0x30)&&(body_str[x+1] <= 0x39)){
-					one =body_str[x+1]-'0';
-				}
-				else{
-					one =body_str[x+1]-'a'+10;
-				}			
-
-				sum = ten*16 + one;
-				mg_write(conn, &sum, 1);
-
-				x=x+2;
-			}			
-		}	
-
-}
-
 /* This is the heart of the Civetweb's logic.
  * This function is called when the request is read, parsed and validated,
  * and Civetweb must decide what action to take: serve a file, or
@@ -14450,7 +14427,6 @@ handle_request(struct mg_connection *conn)
 		is_script_resource = 1;
 		is_put_or_delete_request = is_put_or_delete_method(conn);
 	} else {
-		printf("\r\n a5.2.2");
 	no_callback_resource:
 
 		/* 5.2.2. No callback is responsible for this request. The URI
@@ -14465,6 +14441,14 @@ handle_request(struct mg_connection *conn)
 		              &is_script_resource,
 		              &is_websocket_request,
 		              &is_put_or_delete_request);
+		printf("\r\n is_found:%d",is_found);
+		printf("\r\n is_script_resource:%d",is_script_resource);
+		printf("\r\n is_websocket_request:%d",is_websocket_request);
+		printf("\r\n is_put_or_delete_request:%d",is_put_or_delete_request);
+#if defined(STRING_WEB)		
+		is_found =1;
+		file.stat.is_directory =0;
+#endif				  
 	}
 
 	/* 6. authorization check */
@@ -14694,7 +14678,7 @@ handle_request(struct mg_connection *conn)
 	/* 11. File does not exist, or it was configured that it should be
 	 * hidden */
 	if (!is_found || (must_hide_file(conn, path))) {
-		printf("\r\n a11.404");
+		printf("\r\n a11.404 is_found:%d",is_found);
 		mg_send_http_error(conn, 404, "%s", "Not found");
 		return;
 	}
@@ -14768,115 +14752,8 @@ handle_request(struct mg_connection *conn)
 
 //#endif //hua disable from a11~a14
 
-#if 1
 	/* 15. read a normal file with GET or HEAD */
 	handle_file_based_request(conn, path, &file);
-#else
-	//hua
-/*
-	bootstrap.min.css
-	switch.css
-	bootstrap-slider.min.css
-	jquery.bootstrap-touchspin.css
-	jquery.min.js
-	bootstrap.min.js
-	bootstrap-slider.min.js
-	jquery.bootstrap-touchspin.js
-*/
-
-	int a=0;
-	unsigned long length;
-	char *ptr;
-	
-	printf("\r\nGET path:%s",path);
-	if( ptr=strstr(path,"/css") ){
-		mg_printf(conn,
-				"HTTP/1.1 200 OK\r\nContent-Type: "
-				"text/css\r\nConnection: close\r\n\r\n");			
-		if(ptr=strstr(path,"/bootstrap.min.css")){
-			while(bootstrap_min_css[a] != '\0'){
-				length = strlen(bootstrap_min_css[a]);
-				output_body(conn, bootstrap_min_css[a], length);
-				a++;
-			}
-		}
-		else if(ptr=strstr(path,"/switch.css")){
-			while(switch_css[a] != '\0'){
-				length = strlen(switch_css[a]);
-				output_body(conn, switch_css[a], length);
-				a++;
-			}						
-		}
-		else if(ptr=strstr(path,"/bootstrap-slider.min.css")){
-			while(bootstrap_slider_min_css[a] != '\0'){
-				length = strlen(bootstrap_slider_min_css[a]);
-				output_body(conn, bootstrap_slider_min_css[a], length);
-				a++;
-			}										
-		}
-		else if(ptr=strstr(path,"/jquery.bootstrap-touchspin.css")){	
-			while(jquery_bootstrap_touchspin_css[a] != '\0'){
-				length = strlen(jquery_bootstrap_touchspin_css[a]);
-				output_body(conn, jquery_bootstrap_touchspin_css[a], length);
-				a++;
-			}			
-		}				
-	}
-	else if(ptr=strstr(path,"/js")){
-		mg_printf(conn,
-				"HTTP/1.1 200 OK\r\nContent-Type: "
-				"application/javascript\r\nConnection: close\r\n\r\n");			
-		if(ptr=strstr(path,"/jquery.min.js")){
-			while(jquery_min_js[a] != '\0'){
-				length = strlen(jquery_min_js[a]);
-				output_body(conn, jquery_min_js[a], length);
-				a++;
-			}			
-		}
-		else if(ptr=strstr(path,"/bootstrap.min.js")){
-			while(bootstrap_min_js[a] != '\0'){
-				length = strlen(bootstrap_min_js[a]);
-				output_body(conn, bootstrap_min_js[a], length);
-				a++;
-			}			
-		}
-		else if(ptr=strstr(path,"/bootstrap-slider.min.js")){
-			while(bootstrap_slider_min_js[a] != '\0'){
-				length = strlen(bootstrap_slider_min_js[a]);
-				output_body(conn, bootstrap_slider_min_js[a], length);
-				a++;
-			}				
-		}
-		else if(ptr=strstr(path,"/jquery.bootstrap-touchspin.js")){
-			while(jquery_bootstrap_touchspin_js[a] != '\0'){
-				length = strlen(jquery_bootstrap_touchspin_js[a]);
-				output_body(conn, jquery_bootstrap_touchspin_js[a], length);
-				a++;
-			}									
-		}
-	}
-	else{
-		//index
-		//unsigned long length;
-		//unsigned char ten=0, one=0, sum=0;		
-		mg_printf(conn,
-				"HTTP/1.1 200 OK\r\nContent-Type: "
-				"text/html\r\nConnection: close\r\n\r\n");
-		
-		//length = strlen(index_string_arr);
-		//output_body(conn, index_string_arr, length);				
- 
-		while(index_string_arr[a] != '\0'){
-			length = strlen(index_string_arr[a]);
-			output_body(conn, index_string_arr[a], length);
-			//len=strlen(index_string_arr[a]);
-			//mg_write(conn, index_string_arr[a], len);
-			a++;
-		}
-		
-	}
-#endif
-
 
 #endif /* !defined(NO_FILES) */
 }
