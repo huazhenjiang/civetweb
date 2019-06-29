@@ -10026,6 +10026,8 @@ fclose_on_exec(struct mg_file_access *filep, struct mg_connection *conn)
 #endif
 
 #if defined(STRING_WEB)
+//hua
+#if 0
 void output_body(struct mg_connection *conn, char *body_str, unsigned long size){
 		unsigned long x=0;
 		unsigned char ten,one,sum;
@@ -10049,6 +10051,42 @@ void output_body(struct mg_connection *conn, char *body_str, unsigned long size)
 				mg_write(conn, &sum, 1);
 
 				x=x+2;
+			}			
+		}	
+}
+#endif
+
+unsigned long get_array_size(char *inputStr){
+	//return sizeof(inputStr)/sizeof(inputStr[0]);
+	return sizeof(inputStr);
+}
+
+void output_body(struct mg_connection *conn, char *body_str, unsigned long size){
+		unsigned long x=0;
+		//unsigned char ten,one,sum;
+		if(size > 0){
+			while(x<size){
+/* 
+				if((body_str[x] >= 0x30)&&(body_str[x] <= 0x39)){
+					ten =body_str[x]-'0';
+				}
+				else{
+					ten =body_str[x]-'a'+10;
+				}
+
+				if((body_str[x+1] >= 0x30)&&(body_str[x+1] <= 0x39)){
+					one =body_str[x+1]-'0';
+				}
+				else{
+					one =body_str[x+1]-'a'+10;
+				}			
+
+				sum = ten*16 + one;
+*/
+				
+				mg_write(conn, &(body_str[x]), 1024);
+
+				x=x+1024;
 			}			
 		}	
 }
@@ -10329,9 +10367,23 @@ handle_static_file_request(struct mg_connection *conn,
 		{
 			printf("[y]");
 #if defined(STRING_WEB)
-			unsigned long length;
+			unsigned long length=0;
 			char *ptr;
-			
+			//stringweb_table
+			char *fake="<html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
+
+			if( (ptr=strstr(path,"/index.html")) ){
+				if(index_html[0] != '\0'){	
+					//length = get_array_size(index_html);
+					//printf("\r\n%8d",length);
+					//output_body(conn, index_html, length);
+					length = get_array_size(fake);
+					printf("\r\n%8d",length);
+					output_body(conn, fake, length);
+				}
+			}	
+//hua
+#if 0			
 			if( (ptr=strstr(path,"/css")) ){		
 				if( (ptr=strstr(path,"/bootstrap.min.css")) ){
 					if(bootstrap_min_css[0] != '\0'){	
@@ -10398,12 +10450,15 @@ handle_static_file_request(struct mg_connection *conn,
 					}
 				}
 				else{
+					printf("[z]");
 					if(index_html[0] != '\0'){	
 						length = strlen(index_html);
 						output_body(conn, index_html, length);
 					}					
 				}		
 			}
+#endif
+
 #else			
 			/* Send file directly */
 			send_file_data(conn, filep, r1, cl);

@@ -1,1 +1,1 @@
-char *blank_html="";
+char blank_html[]={};
