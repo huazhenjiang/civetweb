@@ -10055,40 +10055,110 @@ void output_body(struct mg_connection *conn, char *body_str, unsigned long size)
 		}	
 }
 #endif
+/* 
+//splitpath with dir, file's name and extension name
 
-unsigned long get_array_size(char *inputStr){
-	//return sizeof(inputStr)/sizeof(inputStr[0]);
-	return sizeof(inputStr);
+static void _split_whole_name(const char *whole_name, char *fname, char *ext)
+{
+	char *p_ext;
+ 
+	p_ext = rindex(whole_name, '.');
+	if (NULL != p_ext)
+	{
+		strcpy(ext, p_ext);
+		snprintf(fname, p_ext - whole_name + 1, "%s", whole_name);
+	}
+	else
+	{
+		ext[0] = '\0';
+		strcpy(fname, whole_name);
+	}
 }
 
+void _splitpath(const char *path, char *drive, char *dir, char *fname, char *ext)
+{
+	char *p_whole_name;
+ 
+	drive[0] = '\0';
+	if (NULL == path)
+	{
+		dir[0] = '\0';
+		fname[0] = '\0';
+		ext[0] = '\0';
+		return;
+	}
+ 
+	if ('/' == path[strlen(path)])
+	{
+		strcpy(dir, path);
+		fname[0] = '\0';
+		ext[0] = '\0';
+		return;
+	}
+ 
+	p_whole_name = rindex(path, '/');
+	if (NULL != p_whole_name)
+	{
+		p_whole_name++;
+		_split_whole_name(p_whole_name, fname, ext);
+ 
+		snprintf(dir, p_whole_name - path, "%s", path);
+	}
+	else
+	{
+		_split_whole_name(path, fname, ext);
+		dir[0] = '\0';
+	}
+}
+*/
+
+
 void output_body(struct mg_connection *conn, char *body_str, unsigned long size){
+ 
 		unsigned long x=0;
 		//unsigned char ten,one,sum;
 		if(size > 0){
 			while(x<size){
-/* 
-				if((body_str[x] >= 0x30)&&(body_str[x] <= 0x39)){
-					ten =body_str[x]-'0';
-				}
-				else{
-					ten =body_str[x]-'a'+10;
-				}
-
-				if((body_str[x+1] >= 0x30)&&(body_str[x+1] <= 0x39)){
-					one =body_str[x+1]-'0';
-				}
-				else{
-					one =body_str[x+1]-'a'+10;
-				}			
-
-				sum = ten*16 + one;
-*/
 				
-				mg_write(conn, &(body_str[x]), 1024);
+				//mg_write(conn, &(body_str[x]), 1024*8);
+				mg_write(conn, &(body_str[x]), 1);
 
-				x=x+1024;
-			}			
-		}	
+				//x=x+(1024*8);
+				x=x+1;
+			}
+			printf("\r\nx:%lld",x);				
+		}
+/*
+		char buf[MG_BUF_LEN];
+		int to_read, num_read, num_written;
+		int64_t size=0;
+		while (len > 0) {
+			// Calculate how much to read from the file in the buffer 
+			to_read = sizeof(buf);
+			if ((int64_t)to_read > len) {
+				to_read = (int)len;
+			}
+
+			// Read from file, exit the loop on error 
+			//if ((num_read =
+			//			(int)fread(buf, 1, (size_t)to_read, filep->access.fp))
+			//	<= 0) {
+			//	break;
+			//}
+			memset(buf,0,sizeof(buf));
+			memcpy(buf, &(body_str[size]), sizeof(buf));
+			num_read = sizeof(buf);
+
+			// Send read bytes to the client, exit the loop on error 
+			if ((num_written = mg_write(conn, buf, (size_t)num_read))
+				!= num_read) {
+				break;
+			}
+			size = size + num_written;
+			// Both read and were successful, adjust counters 
+			len -= num_written;
+		}		
+*/
 }
 #endif
 
@@ -10368,20 +10438,76 @@ handle_static_file_request(struct mg_connection *conn,
 			printf("[y]");
 #if defined(STRING_WEB)
 			unsigned long length=0;
-			char *ptr;
-			//stringweb_table
-			char *fake="<html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
+			unsigned int sel=0, enable, target_index=0;
+			char *ptr, *head;
+			char buff[128], reminder[64];
+			unsigned int fname_length=0;
+			const char cmp = '/';
 
-			if( (ptr=strstr(path,"/index.html")) ){
-				if(index_html[0] != '\0'){	
-					//length = get_array_size(index_html);
-					//printf("\r\n%8d",length);
-					//output_body(conn, index_html, length);
-					length = get_array_size(fake);
-					printf("\r\n%8d",length);
-					output_body(conn, fake, length);
+#if 0
+			memset(buff,0,sizeof(buff));
+			memset(reminder,0,sizeof(reminder));
+			strcpy(buff, path);
+			ptr = buff;
+			head = strrchr(buff, cmp);
+			fname_length =strlen(buff) - (head - ptr);
+
+			strncpy(reminder,head, fname_length);
+			reminder[fname_length]='\0';
+			printf("\r\n buff : %s",buff);
+			printf("\r\n reminder : %s",reminder);
+			//printf("\r\n stringweb_table[3*6] : %s",stringweb_table[3*6]);	
+			enable=0;
+			for(sel=0; sel <stringweb_table_count; sel=sel+3 ){
+				memset(buff,0,sizeof(buff));
+				//printf("\r\n stringweb_table[%d] : %s",sel, stringweb_table[sel]);
+				strcpy(buff, stringweb_table[sel]);
+				//printf("\r\n c_buff: %s", buff);
+
+				if( (ptr=strstr(path,buff) ) ){
+				//if( strncmp(reminder[1], buff, strlen(reminder))==0 ){	
+					enable=1;
+					target_index=sel;
 				}
-			}	
+			}
+			printf("\r\nenable:%d, target_index:%d",enable,target_index);
+			if(enable){
+				output_body(conn, stringweb_table[target_index+1], atol(stringweb_table[target_index+2]));
+				//output_body(conn, index_html, atol(stringweb_table[20]));
+			}
+			else{
+				mg_printf(conn, "Error %d: %s\n", 404, "Not Find Anything");
+			}
+#else			
+			
+ 
+			if( (ptr=strstr(path,"/index.html")) ){
+			//if( (ptr=strstr(stringweb_table[],"/index.html")) ){	
+				//if(index_html[0] != '\0'){	
+					//length = get_array_size(index_html);
+					//printf("\r\nlength:%lld",length);	
+					//output_body(conn, index_html, atol(stringweb_table[20]));
+					output_body(conn, index_html, atol(stringweb_table[20]));
+
+				//}
+			}
+			else if( (ptr=strstr(path,"/bootstrap.min.css")) ){
+					//output_body(conn, bootstrap_min_css, atol(stringweb_table[11]));
+			}
+			else if( (ptr=strstr(path,"/switch.css")) ){
+					output_body(conn, switch_css, atol(stringweb_table[32]));
+			}
+			else if( (ptr=strstr(path,"/bootstrap-slider.min.css")) ){
+					output_body(conn, bootstrap_slider_min_css, atol(stringweb_table[5]));
+			}
+			else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.css")) ){
+					output_body(conn, jquery_bootstrap_touchspin_css, atol(stringweb_table[23]));
+			}									
+			else{
+				mg_printf(conn, "Error %d: %s\n", 404, "Not Find Anything");
+			}
+
+#endif				
 //hua
 #if 0			
 			if( (ptr=strstr(path,"/css")) ){		
