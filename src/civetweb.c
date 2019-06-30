@@ -10028,7 +10028,7 @@ fclose_on_exec(struct mg_file_access *filep, struct mg_connection *conn)
 #if defined(STRING_WEB)
 //hua
 static void output_body(struct mg_connection *conn, char *body_str, unsigned long len){
-		int to_read, num_read, num_written;
+		int to_read, num_written;
 		int64_t index=0;
 		
 		while (len > 0) {
@@ -10054,35 +10054,16 @@ static void output_body(struct mg_connection *conn, char *body_str, unsigned lon
 
 static void
 handlen_stringweb_array_request(struct mg_connection *conn,
-                           const char *path,
-                           struct mg_file *filep,
-                           const char *mime_type,
-                           const char *additional_headers)
+                           const char *path)
 {
-			unsigned long length=0,atol_size;
-			unsigned int sel=0, enable, target_index=0;
-			char *ptr, *head;
-			char buff[128], reminder[64];
-			unsigned int fname_length=0;
-			const char cmp = '/';
+
+			char *ptr;
 			int i=0;
 			char *c_file_array_ptr;
 			unsigned long c_file_array_size=0;
-#if 1
-			memset(buff,0,sizeof(buff));
-			memset(reminder,0,sizeof(reminder));
-			atol_size = 0;
-			strcpy(buff, path);
-			ptr = buff;
-			head = strrchr(buff, cmp);
-			fname_length =strlen(buff) - (head - ptr);
 
-			strncpy(reminder,head, fname_length);
-			reminder[fname_length]='\0';
-			printf("\r\n buff : %s",buff);
-			printf("\r\n reminder : %s",reminder);
-			//printf("\r\n stringweb_table[3*6] : %s",stringweb_table[3*6]);	
-			enable=0;
+			int found_array;
+			found_array=0;
 			//header
 			if( (ptr=strstr(path,"/css")) ){		
 					mg_printf(conn,
@@ -10108,119 +10089,13 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 					c_file_array_ptr=stringweb_table[i].ptrname;
 					c_file_array_size=stringweb_table[i].size;
 					output_body(conn, c_file_array_ptr, c_file_array_size);
+					found_array =1;
 					break;
 				}
 				i++;
-			} 		
-
-#else
-			if( (ptr=strstr(path,"/css")) ){		
-				if( (ptr=strstr(path,"/bootstrap.min.css")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/css\r\nConnection: close\r\n\r\n");
-
-					if(bootstrap_min_css[0] != '\0'){	
-						output_body(conn, bootstrap_min_css, atol(stringweb_table[14]));
-					}					
-				}
-				else if( (ptr=strstr(path,"/switch.css")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/css\r\nConnection: close\r\n\r\n");
-
-					if(switch_css[0] != '\0'){	
-						output_body(conn, switch_css, atol(stringweb_table[42]));
-					}											
-				}
-				else if( (ptr=strstr(path,"/bootstrap-slider.min.css")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/css\r\nConnection: close\r\n\r\n");
-
-					if(bootstrap_slider_min_css[0] != '\0'){	
-						output_body(conn, bootstrap_slider_min_css, atol(stringweb_table[6]));
-					}															
-				}
-				else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.css")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/css\r\nConnection: close\r\n\r\n");
-
-					if(jquery_bootstrap_touchspin_css[0] != '\0'){	
-						output_body(conn, jquery_bootstrap_touchspin_css, atol(stringweb_table[30]));
-					}								
-				}				
 			}
-			else if( (ptr=strstr(path,"/js")) ){	
-				if( (ptr=strstr(path,"/jquery.min.js")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/js\r\nConnection: close\r\n\r\n");
-
-					if(jquery_min_js[0] != '\0'){	
-						output_body(conn, jquery_min_js, atol(stringweb_table[38]));
-					}								
-				}
-				else if( (ptr=strstr(path,"/bootstrap.min.js")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/js\r\nConnection: close\r\n\r\n");
-
-					if(bootstrap_min_js[0] != '\0'){	
-						output_body(conn, bootstrap_min_js, atol(stringweb_table[18]));
-					}								
-				}
-				else if( (ptr=strstr(path,"/bootstrap-slider.min.js")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/js\r\nConnection: close\r\n\r\n");
-
-					if(bootstrap_slider_min_js[0] != '\0'){	
-						output_body(conn, bootstrap_slider_min_js, atol(stringweb_table[10]));
-					}									
-				}
-				else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.js")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/js\r\nConnection: close\r\n\r\n");
-
-					if(jquery_bootstrap_touchspin_js[0] != '\0'){	
-						output_body(conn, jquery_bootstrap_touchspin_js, atol(stringweb_table[34]));
-					}														
-				}
-			}
-			else{
-				if( (ptr=strstr(path,"/file_upload.html")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/html\r\nConnection: close\r\n\r\n");
-
-					if(file_upload_html[0] != '\0'){	
-						output_body(conn, file_upload_html, atol(stringweb_table[22]));
-					}
-				}				
-				else if( (ptr=strstr(path,"/blank.html")) ){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/html\r\nConnection: close\r\n\r\n");					
-					//if(blank_html[0] != '\0'){	
-						output_body(conn, blank_html, atol(stringweb_table[2]));
-					//}
-				}
-				else{
-					if(index_html[0] != '\0'){
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/html\r\nConnection: close\r\n\r\n");
-						//"Content-Length: %" INT64_FMT "\r\n",
-						//atol(stringweb_table[26]) );
-
-						output_body(conn, index_html, atol(stringweb_table[26]));
-					}					
-				}		
-			}
-#endif
+			if(found_array == 0) 	
+				mg_send_http_error(conn, 404, "%s", "Error: File not found");	
 }
 						   
 
@@ -10341,8 +10216,7 @@ handle_static_file_request(struct mg_connection *conn,
 #endif
 		}
 	}
-	printf("[j]");
-#if !defined(STRING_WEB)	
+	printf("[j]");	
 	if (!mg_fopen(conn, path, MG_FOPEN_MODE_READ, filep)) {
 		printf("[k]");
 		mg_send_http_error(conn,
@@ -10354,7 +10228,7 @@ handle_static_file_request(struct mg_connection *conn,
 	}
 	printf("[l]");
 	fclose_on_exec(&filep->access, conn);
-#endif
+
 	/* If "Range" request was made: parse header, send only selected part
 	 * of the file. */
 	r1 = r2 = 0;
@@ -10499,136 +10373,15 @@ handle_static_file_request(struct mg_connection *conn,
 		} else
 #endif
 		{
-			printf("[y]");
-#if defined(STRING_WEB)
-			unsigned long length=0,atol_size;
-			unsigned int sel=0, enable, target_index=0;
-			char *ptr, *head;
-			char buff[128], reminder[64];
-			unsigned int fname_length=0;
-			const char cmp = '/';
-
-#if 0
-			memset(buff,0,sizeof(buff));
-			memset(reminder,0,sizeof(reminder));
-			atol_size = 0;
-			strcpy(buff, path);
-			ptr = buff;
-			head = strrchr(buff, cmp);
-			fname_length =strlen(buff) - (head - ptr);
-
-			strncpy(reminder,head, fname_length);
-			reminder[fname_length]='\0';
-			printf("\r\n buff : %s",buff);
-			printf("\r\n reminder : %s",reminder);
-			//printf("\r\n stringweb_table[3*6] : %s",stringweb_table[3*6]);	
-			enable=0;
-			for(sel=0; sel <stringweb_table_count; sel=sel+4 ){
-				memset(buff,0,sizeof(buff));
-				//printf("\r\n stringweb_table[%d] : %s",sel, stringweb_table[sel]);
-				strcpy(buff, stringweb_table[sel]);
-				//printf("\r\n c_buff: %s", buff);
-
-				if( (ptr=strstr(path,buff) ) ){
-				//if( strncmp(reminder[1], buff, strlen(reminder))==0 ){	
-					enable=1;
-					target_index=sel;
-				}
-			}
-			printf("\r\nenable:%d, target_index:%d",enable,target_index);
-			memset(buff,0,sizeof(buff));
-			if(enable){
-				strcpy(buff, stringweb_table[target_index+3]);
-				atol_size=atol(stringweb_table[target_index+2]);
-				printf("\r\nstringweb_table[target_index+3]:%s",stringweb_table[target_index+3]);
-				printf("\r\nstringweb_table[target_index+2]:%s",stringweb_table[target_index+2]);
-				printf("\r\nbuff-[target_index+3]:%s",buff);
-				printf("\r\natol_size-[target_index+3]:%ld",atol_size);				
-				output_body(conn, stringweb_table[target_index+3], atol(stringweb_table[target_index+2]));
-				//output_body(conn, buff, atol_size);
-				//output_body(conn, index_html, atol(stringweb_table[20]));
-			}
-			else{
-				//mg_printf(conn, "Error %d: %s\n", 404, "Not Find Anything");
-			}
-			
-			
-			if( (ptr=strstr(path,"/css")) ){		
-				if( (ptr=strstr(path,"/bootstrap.min.css")) ){
-					if(bootstrap_min_css[0] != '\0'){	
-						output_body(conn, bootstrap_min_css, atol(stringweb_table[14]));
-					}					
-				}
-				else if( (ptr=strstr(path,"/switch.css")) ){
-					if(switch_css[0] != '\0'){	
-						output_body(conn, switch_css, atol(stringweb_table[42]));
-					}											
-				}
-				else if( (ptr=strstr(path,"/bootstrap-slider.min.css")) ){
-					if(bootstrap_slider_min_css[0] != '\0'){	
-						output_body(conn, bootstrap_slider_min_css, atol(stringweb_table[6]));
-					}															
-				}
-				else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.css")) ){	
-					if(jquery_bootstrap_touchspin_css[0] != '\0'){	
-						output_body(conn, jquery_bootstrap_touchspin_css, atol(stringweb_table[30]));
-					}								
-				}				
-			}
-			else if( (ptr=strstr(path,"/js")) ){	
-				if( (ptr=strstr(path,"/jquery.min.js")) ){
-					if(jquery_min_js[0] != '\0'){	
-						output_body(conn, jquery_min_js, atol(stringweb_table[38]));
-					}								
-				}
-				else if( (ptr=strstr(path,"/bootstrap.min.js")) ){
-					if(bootstrap_min_js[0] != '\0'){	
-						output_body(conn, bootstrap_min_js, atol(stringweb_table[18]));
-					}								
-				}
-				else if( (ptr=strstr(path,"/bootstrap-slider.min.js")) ){
-					if(bootstrap_slider_min_js[0] != '\0'){	
-						output_body(conn, bootstrap_slider_min_js, atol(stringweb_table[10]));
-					}									
-				}
-				else if( (ptr=strstr(path,"/jquery.bootstrap-touchspin.js")) ){
-					if(jquery_bootstrap_touchspin_js[0] != '\0'){	
-						output_body(conn, jquery_bootstrap_touchspin_js, atol(stringweb_table[34]));
-					}														
-				}
-			}
-			else{
-				if( (ptr=strstr(path,"/file_upload.html")) ){
-					if(file_upload_html[0] != '\0'){	
-						output_body(conn, file_upload_html, atol(stringweb_table[22]));
-					}
-				}				
-				else if( (ptr=strstr(path,"/blank.html")) ){
-					//if(blank_html[0] != '\0'){	
-						output_body(conn, blank_html, atol(stringweb_table[2]));
-					//}
-				}
-				else{
-					printf("[z]");
-					if(index_html[0] != '\0'){	
-						output_body(conn, index_html, atol(stringweb_table[26]));
-					}					
-				}		
-			}
-
-
-#endif				
-
-#else			
+			printf("[y]");		
 			/* Send file directly */
-			send_file_data(conn, filep, r1, cl);
-#endif			
+			send_file_data(conn, filep, r1, cl);		
 		}
 	}
-#if !defined(STRING_WEB)	
+	
 	//printf("[z]");
 	(void)mg_fclose(&filep->access); /* ignore error on read only file */
-#endif	
+
 }
 
 
@@ -15069,7 +14822,7 @@ handle_file_based_request(struct mg_connection *conn,
 		//hua
 		printf("\r\nfile path:%s",path);
 #if defined(STRING_WEB)		
-		handlen_stringweb_array_request(conn, path, file, NULL, NULL);
+		handlen_stringweb_array_request(conn, path);
 #else		
 		handle_static_file_request(conn, path, file, NULL, NULL);
 #endif		
