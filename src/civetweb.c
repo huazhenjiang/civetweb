@@ -10028,23 +10028,6 @@ fclose_on_exec(struct mg_file_access *filep, struct mg_connection *conn)
 #if defined(STRING_WEB)
 //hua
 static void output_body(struct mg_connection *conn, char *body_str, unsigned long len){
-/* 
-		unsigned long x=0;
-		//printf("\r\noutput_body:%s",body_str);
-		//printf("\r\noutput_body:%ld",size);
-		if(size > 0){
-			while(x<size){
-				
-				//mg_write(conn, &(body_str[x]), 1024*8);
-				mg_write(conn, &(body_str[x]), 1);
-
-				//x=x+(1024*8);
-				x=x+1;
-			}
-			printf("\r\nx:%ld",x);				
-		}
-*/
-
 		int to_read, num_read, num_written;
 		int64_t index=0;
 		
@@ -10082,7 +10065,55 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 			char buff[128], reminder[64];
 			unsigned int fname_length=0;
 			const char cmp = '/';
+			int i=0;
+			char *c_file_array_ptr;
+			unsigned long c_file_array_size=0;
+#if 1
+			memset(buff,0,sizeof(buff));
+			memset(reminder,0,sizeof(reminder));
+			atol_size = 0;
+			strcpy(buff, path);
+			ptr = buff;
+			head = strrchr(buff, cmp);
+			fname_length =strlen(buff) - (head - ptr);
 
+			strncpy(reminder,head, fname_length);
+			reminder[fname_length]='\0';
+			printf("\r\n buff : %s",buff);
+			printf("\r\n reminder : %s",reminder);
+			//printf("\r\n stringweb_table[3*6] : %s",stringweb_table[3*6]);	
+			enable=0;
+			//header
+			if( (ptr=strstr(path,"/css")) ){		
+					mg_printf(conn,
+						"HTTP/1.1 200 OK\r\nContent-Type: "
+						"text/css\r\nConnection: close\r\n\r\n");
+			}
+			else if( (ptr=strstr(path,"/js")) ){	
+					mg_printf(conn,
+						"HTTP/1.1 200 OK\r\nContent-Type: "
+						"text/js\r\nConnection: close\r\n\r\n");
+			}
+			else {
+					mg_printf(conn,
+						"HTTP/1.1 200 OK\r\nContent-Type: "
+						"text/html\r\nConnection: close\r\n\r\n");
+			}
+
+			//body
+			while( stringweb_table[i].filename!= NULL){
+				//printf("\r\n stringweb_table fn:%s, an:%s, size:%ld, addr:%08x", &(stringweb_table[i].filename[0]), stringweb_table[i].arrayname, stringweb_table[i].size, stringweb_table[i].ptrname);
+				//if(strncmp(&(stringweb_table[i].)  )==0){
+				if(ptr=strstr(path, &(stringweb_table[i].filename[0])) ){
+					c_file_array_ptr=stringweb_table[i].ptrname;
+					c_file_array_size=stringweb_table[i].size;
+					output_body(conn, c_file_array_ptr, c_file_array_size);
+					break;
+				}
+				i++;
+			} 		
+
+#else
 			if( (ptr=strstr(path,"/css")) ){		
 				if( (ptr=strstr(path,"/bootstrap.min.css")) ){
 					mg_printf(conn,
@@ -10189,7 +10220,7 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 					}					
 				}		
 			}
-
+#endif
 }
 						   
 
@@ -10520,7 +10551,7 @@ handle_static_file_request(struct mg_connection *conn,
 			else{
 				//mg_printf(conn, "Error %d: %s\n", 404, "Not Find Anything");
 			}
-#else			
+			
 			
 			if( (ptr=strstr(path,"/css")) ){		
 				if( (ptr=strstr(path,"/bootstrap.min.css")) ){

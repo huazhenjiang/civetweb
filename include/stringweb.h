@@ -1,17 +1,3 @@
-unsigned int stringweb_table_count=44;
-const char *stringweb_table[] = {
-	"blank.html", "blank_html", "0", "blank_html_ptr",
-	"bootstrap-slider.min.css", "bootstrap_slider_min_css", "7648", "bootstrap_slider_min_css_ptr",
-	"bootstrap-slider.min.js", "bootstrap_slider_min_js", "37734", "bootstrap_slider_min_js_ptr",
-	"bootstrap.min.css", "bootstrap_min_css", "121200", "bootstrap_min_css_ptr",
-	"bootstrap.min.js", "bootstrap_min_js", "37045", "bootstrap_min_js_ptr",
-	"file_upload.html", "file_upload_html", "233", "file_upload_html_ptr",
-	"index.html", "index_html", "38055", "index_html_ptr",
-	"jquery.bootstrap-touchspin.css", "jquery_bootstrap_touchspin_css", "527", "jquery_bootstrap_touchspin_css_ptr",
-	"jquery.bootstrap-touchspin.js", "jquery_bootstrap_touchspin_js", "22369", "jquery_bootstrap_touchspin_js_ptr",
-	"jquery.min.js", "jquery_min_js", "97163", "jquery_min_js_ptr",
-	"switch.css", "switch_css", "1430", "switch_css_ptr",
-};
 extern char blank_html[];
 extern char bootstrap_slider_min_css[];
 extern char bootstrap_slider_min_js[];
@@ -23,14 +9,24 @@ extern char jquery_bootstrap_touchspin_css[];
 extern char jquery_bootstrap_touchspin_js[];
 extern char jquery_min_js[];
 extern char switch_css[];
-extern char *blank_html_ptr;
-extern char *bootstrap_slider_min_css_ptr;
-extern char *bootstrap_slider_min_js_ptr;
-extern char *bootstrap_min_css_ptr;
-extern char *bootstrap_min_js_ptr;
-extern char *file_upload_html_ptr;
-extern char *index_html_ptr;
-extern char *jquery_bootstrap_touchspin_css_ptr;
-extern char *jquery_bootstrap_touchspin_js_ptr;
-extern char *jquery_min_js_ptr;
-extern char *switch_css_ptr;
+typedef struct _stringweb_table_{
+	char *filename;
+	char *arrayname;
+	unsigned long size;
+	char *ptrname;
+}stb;
+unsigned int stringweb_table_count=44;
+stb stringweb_table[] = {
+	{"blank.html", "blank_html", 0, (char *)&(blank_html[0]) },
+	{"bootstrap-slider.min.css", "bootstrap_slider_min_css", 7648, (char *)&(bootstrap_slider_min_css[0]) },
+	{"bootstrap-slider.min.js", "bootstrap_slider_min_js", 37734, (char *)&(bootstrap_slider_min_js[0]) },
+	{"bootstrap.min.css", "bootstrap_min_css", 121200, (char *)&(bootstrap_min_css[0]) },
+	{"bootstrap.min.js", "bootstrap_min_js", 37045, (char *)&(bootstrap_min_js[0]) },
+	{"file_upload.html", "file_upload_html", 233, (char *)&(file_upload_html[0]) },
+	{"index.html", "index_html", 38055, (char *)&(index_html[0]) },
+	{"jquery.bootstrap-touchspin.css", "jquery_bootstrap_touchspin_css", 527, (char *)&(jquery_bootstrap_touchspin_css[0]) },
+	{"jquery.bootstrap-touchspin.js", "jquery_bootstrap_touchspin_js", 22369, (char *)&(jquery_bootstrap_touchspin_js[0]) },
+	{"jquery.min.js", "jquery_min_js", 97163, (char *)&(jquery_min_js[0]) },
+	{"switch.css", "switch_css", 1430, (char *)&(switch_css[0]) },
+	{NULL, NULL, 0, NULL},
+};
