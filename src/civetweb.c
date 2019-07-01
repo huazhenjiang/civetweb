@@ -10053,8 +10053,11 @@ static void output_body(struct mg_connection *conn, char *body_str, unsigned lon
 }
 
 static void
-handlen_stringweb_array_request(struct mg_connection *conn,
-                           const char *path)
+handle_stringweb_array_request(struct mg_connection *conn,
+                           const char *path,
+                           struct mg_file *filep,
+                           const char *mime_type,
+                           const char *additional_headers)
 {
 
 			//char *ptr;
@@ -10067,8 +10070,12 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 			unsigned int fname_length=0;
 			const char cmp = '/';
 
+			struct vec mime_vec;
+
 			int found_array;
 			found_array=0;
+
+
 
 			memset(buff,0,sizeof(buff));
 			memset(reminder,0,sizeof(reminder));
@@ -10090,7 +10097,20 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 				strncpy(buff, "index.html", sizeof("index.html"));				
 			}
 
+			if (mime_type == NULL) {
+				get_mime_type(conn, buff, &mime_vec);
+			}
+			printf("\r\n [mime_vec.ptr]:%s",mime_vec.ptr);
+
 			//header
+			(void)mg_printf(conn,
+							"HTTP/1.1 200 OK\r\n"
+							"Content-Type: %.*s\r\n"
+							"Connection: close\r\n\r\n",
+							(int)mime_vec.len,
+							mime_vec.ptr);
+
+/* 
 			if( (ptr=strstr(buff,".css")) ){		
 					mg_printf(conn,
 						"HTTP/1.1 200 OK\r\nContent-Type: "
@@ -10111,7 +10131,7 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 			//{
 			//	mg_send_http_error(conn, 404, "%s", "Error: File not found");
 			//}
-			
+*/			
 
 			//body
 			while( stringweb_table[i].filename!= NULL){
@@ -10187,6 +10207,7 @@ handle_static_file_request(struct mg_connection *conn,
 		                   filep->stat.size);
 		return;
 	}
+	printf("\r\n [mime_vec.ptr]:%s",mime_vec.ptr);
 	printf("[d]");
 	cl = (int64_t)filep->stat.size;
 	conn->status_code = 200;
@@ -10334,7 +10355,7 @@ handle_static_file_request(struct mg_connection *conn,
 	gmt_time_string(date, sizeof(date), &curtime);
 	gmt_time_string(lm, sizeof(lm), &filep->stat.last_modified);
 	construct_etag(etag, sizeof(etag), &filep->stat);
-
+	
 	/* Send header */
 	(void)mg_printf(conn,
 	                "HTTP/1.1 %d %s\r\n"
@@ -14854,7 +14875,7 @@ handle_file_based_request(struct mg_connection *conn,
 		//hua
 		printf("\r\nfile path:%s",path);
 #if defined(STRING_WEB)		
-		handlen_stringweb_array_request(conn, path);
+		handle_stringweb_array_request(conn, path, file, NULL, NULL);
 #else		
 		handle_static_file_request(conn, path, file, NULL, NULL);
 #endif		
