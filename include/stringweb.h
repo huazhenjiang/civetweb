@@ -28,5 +28,6 @@ stb stringweb_table[] = {
 	{"jquery.bootstrap-touchspin.js", "jquery_bootstrap_touchspin_js", 22369, (char *)&(jquery_bootstrap_touchspin_js[0]) },
 	{"jquery.min.js", "jquery_min_js", 97163, (char *)&(jquery_min_js[0]) },
 	{"switch.css", "switch_css", 1430, (char *)&(switch_css[0]) },
+	//{"", "index_html", 38055, (char *)&(index_html[0]) },
 	{NULL, NULL, 0, NULL},
 };

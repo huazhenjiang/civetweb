@@ -10057,35 +10057,70 @@ handlen_stringweb_array_request(struct mg_connection *conn,
                            const char *path)
 {
 
-			char *ptr;
+			//char *ptr;
 			int i=0;
 			char *c_file_array_ptr;
 			unsigned long c_file_array_size=0;
 
+			char *ptr, *head;
+			char buff[128], reminder[64];
+			unsigned int fname_length=0;
+			const char cmp = '/';
+
 			int found_array;
 			found_array=0;
+
+			memset(buff,0,sizeof(buff));
+			memset(reminder,0,sizeof(reminder));
+			strcpy(buff, path);
+			ptr = buff;
+			head = strrchr(buff, cmp);
+			fname_length =strlen(buff) - (head - ptr);
+
+			strncpy(reminder,head, fname_length);
+			reminder[fname_length]='\0';
+			printf("\r\n reminder : %s",reminder);
+			memset(buff,0,sizeof(buff));
+			strncpy(buff, &(reminder[1]), fname_length-1);
+			printf("\r\n buff : %s",buff);
+
+			printf("\r\n server root:%s",conn->dom_ctx->config[DOCUMENT_ROOT]);
+			if( strcmp(path ,conn->dom_ctx->config[DOCUMENT_ROOT]) ==0 ){
+				memset(buff,0,sizeof(buff));
+				strncpy(buff, "index.html", sizeof("index.html"));				
+			}
+			if(ptr=strstr(path, "blank.html") ){
+				memset(buff,0,sizeof(buff));
+				strncpy(buff, "blank.html", sizeof("blank.html"));				
+			}
 			//header
-			if( (ptr=strstr(path,"/css")) ){		
+			if( (ptr=strstr(buff,".css")) ){		
 					mg_printf(conn,
 						"HTTP/1.1 200 OK\r\nContent-Type: "
 						"text/css\r\nConnection: close\r\n\r\n");
 			}
-			else if( (ptr=strstr(path,"/js")) ){	
+			else if( (ptr=strstr(buff,".js")) ){	
 					mg_printf(conn,
 						"HTTP/1.1 200 OK\r\nContent-Type: "
 						"text/js\r\nConnection: close\r\n\r\n");
 			}
-			else {
+			//else if( (ptr=strstr(buff,".html")) ){
+			else{
 					mg_printf(conn,
 						"HTTP/1.1 200 OK\r\nContent-Type: "
 						"text/html\r\nConnection: close\r\n\r\n");
 			}
+			//else
+			//{
+			//	mg_send_http_error(conn, 404, "%s", "Error: File not found");
+			//}
+			
 
 			//body
 			while( stringweb_table[i].filename!= NULL){
 				//printf("\r\n stringweb_table fn:%s, an:%s, size:%ld, addr:%08x", &(stringweb_table[i].filename[0]), stringweb_table[i].arrayname, stringweb_table[i].size, stringweb_table[i].ptrname);
-				//if(strncmp(&(stringweb_table[i].)  )==0){
-				if(ptr=strstr(path, &(stringweb_table[i].filename[0])) ){
+				if( strcmp(buff ,&(stringweb_table[i].filename[0])) ==0 ){
+				//if(ptr=strstr(path, &(stringweb_table[i].filename[0])) ){
 					c_file_array_ptr=stringweb_table[i].ptrname;
 					c_file_array_size=stringweb_table[i].size;
 					output_body(conn, c_file_array_ptr, c_file_array_size);
