@@ -10089,10 +10089,7 @@ handlen_stringweb_array_request(struct mg_connection *conn,
 				memset(buff,0,sizeof(buff));
 				strncpy(buff, "index.html", sizeof("index.html"));				
 			}
-			if(ptr=strstr(path, "blank.html") ){
-				memset(buff,0,sizeof(buff));
-				strncpy(buff, "blank.html", sizeof("blank.html"));				
-			}
+
 			//header
 			if( (ptr=strstr(buff,".css")) ){		
 					mg_printf(conn,
