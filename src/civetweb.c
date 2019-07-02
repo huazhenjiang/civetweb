@@ -10122,7 +10122,7 @@ handle_stringweb_array_request(struct mg_connection *conn,
 				i++;
 			}
 			if(found_array == 0) 	
-				mg_send_http_error(conn, 404, "%s", "Error: File not found");	
+				mg_send_http_error(conn, 404, "%s", "Not found");	
 }
 						   
 
