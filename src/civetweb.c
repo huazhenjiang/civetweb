@@ -10059,8 +10059,6 @@ handle_stringweb_array_request(struct mg_connection *conn,
                            const char *mime_type,
                            const char *additional_headers)
 {
-
-			//char *ptr;
 			int i=0;
 			char *c_file_array_ptr;
 			unsigned long c_file_array_size=0;
@@ -10074,8 +10072,6 @@ handle_stringweb_array_request(struct mg_connection *conn,
 
 			int found_array;
 			found_array=0;
-
-
 
 			memset(buff,0,sizeof(buff));
 			memset(reminder,0,sizeof(reminder));
@@ -10096,48 +10092,27 @@ handle_stringweb_array_request(struct mg_connection *conn,
 				memset(buff,0,sizeof(buff));
 				strncpy(buff, "index.html", sizeof("index.html"));				
 			}
-
-			if (mime_type == NULL) {
-				get_mime_type(conn, buff, &mime_vec);
-			}
-			printf("\r\n [mime_vec.ptr]:%s",mime_vec.ptr);
-
-			//header
-			(void)mg_printf(conn,
-							"HTTP/1.1 200 OK\r\n"
-							"Content-Type: %.*s\r\n"
-							"Connection: close\r\n\r\n",
-							(int)mime_vec.len,
-							mime_vec.ptr);
-
-/* 
-			if( (ptr=strstr(buff,".css")) ){		
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/css\r\nConnection: close\r\n\r\n");
-			}
-			else if( (ptr=strstr(buff,".js")) ){	
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/js\r\nConnection: close\r\n\r\n");
-			}
-			//else if( (ptr=strstr(buff,".html")) ){
-			else{
-					mg_printf(conn,
-						"HTTP/1.1 200 OK\r\nContent-Type: "
-						"text/html\r\nConnection: close\r\n\r\n");
-			}
-			//else
-			//{
-			//	mg_send_http_error(conn, 404, "%s", "Error: File not found");
-			//}
-*/			
-
-			//body
+			
 			while( stringweb_table[i].filename!= NULL){
 				//printf("\r\n stringweb_table fn:%s, an:%s, size:%ld, addr:%08x", &(stringweb_table[i].filename[0]), stringweb_table[i].arrayname, stringweb_table[i].size, stringweb_table[i].ptrname);
 				if( strcmp(buff ,&(stringweb_table[i].filename[0])) ==0 ){
 				//if(ptr=strstr(path, &(stringweb_table[i].filename[0])) ){
+
+					if (mime_type == NULL) {
+						get_mime_type(conn, buff, &mime_vec);
+					}
+					printf("\r\n [mime_vec.ptr]:%s",mime_vec.ptr);
+
+					//header
+					(void)mg_printf(conn,
+									"HTTP/1.1 200 OK\r\n"
+									"Content-Type: %.*s\r\n"
+									"Content-Length: %" INT64_FMT "\r\n"
+									"Connection: close\r\n\r\n",
+									(int)mime_vec.len,
+									mime_vec.ptr,
+									stringweb_table[i].size);
+					//body
 					c_file_array_ptr=stringweb_table[i].ptrname;
 					c_file_array_size=stringweb_table[i].size;
 					output_body(conn, c_file_array_ptr, c_file_array_size);
